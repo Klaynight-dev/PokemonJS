@@ -1,3 +1,11 @@
+/**
+ * List of all Pokemon types in the game, with their stats.
+ * @property {string}   form           - The form of the Pokemon (e.g., "Normal")
+ * @property {int}      pokemon_id     - The unique identifier for the Pokemon
+ * @property {string}   pokemon_name   - The name of the Pokemon
+ * @property {string[]} type           - The types of the Pokemon (e.g., ["Poison, Grass"])
+ */
+
 const pokemon_types =
     [
         {
