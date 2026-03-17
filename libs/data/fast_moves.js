@@ -1,3 +1,9 @@
+/**
+ * List of all fast moves in the game, with their stats.
+ * @property {int} duration           - The duration of the move in milliseconds
+ * @property {} energy_delta
+ */
+
 const fast_moves =
     [
         {
