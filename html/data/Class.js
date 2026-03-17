@@ -1,7 +1,7 @@
 export class Attack {
     static all_attacks = [];
 
-    constructor(move_id, name, type, power, duration, energy_delta, critical_chance, stamina_loss_scaler) {
+    constructor(critical_chance=0, duration, energy_delta, move_id, name, power, stamina_loss_scaler, type) {
         /**
          * @property {int}    id                   - The unique identifier for the move
          * @property {string} name                 - The name of the move
@@ -11,6 +11,7 @@ export class Attack {
          * @property {int}    energy_delta         - The amount of energy gained or lost when using the move
          * @property {float}  critical_chance      - The chance of landing a critical hit with the move (between 0 and 1)
          * @property {float}  stamina_loss_scaler  - The scaler for stamina loss when using the move
+         * @property {boolean} isCriticalAttack    - Indicates whether the move is a critical attack
          * @function Attack.fill_attacks(data)     - A static method to fill the list of all attacks from a data array
          */
         this.id = move_id;
@@ -21,6 +22,7 @@ export class Attack {
         this.energy_delta = energy_delta;
         this.critical_chance = critical_chance;
         this.stamina_loss_scaler = stamina_loss_scaler;
+        this.isCriticalAttack = critical_chance > 0;
         Attack.all_attacks.push(this);
     }
 
@@ -31,7 +33,9 @@ export class Attack {
 
     static fill_attacks(data) {
         for (const attack_data of data) {
-            new Attack(attack_data.move_id, attack_data.name, attack_data.type, attack_data.power, attack_data.duration, attack_data.energy_delta, attack_data.critical_chance, attack_data.stamina_loss_scaler);
+            new Attack(attack_data.critical_chance, attack_data.duration, attack_data.energy_delta,
+                attack_data.move_id, attack_data.name, attack_data.power, attack_data.stamina_loss_scaler,
+                attack_data.type);
         }
     }
 
