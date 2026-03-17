@@ -127,7 +127,7 @@ export class Pokemon {
     }
 }
 
-class Type{
+export class Type{
     static all_types = [];
     constructor(type_name, efficiency){
         this.type_name = type_name;
@@ -137,5 +137,12 @@ class Type{
 
     toString(){
         return this.type_name + ' : '
+    }
+
+    get type_name() {
+        return this._type_name;
+    }
+    get efficiency() {
+        return this._efficiency;
     }
 }
