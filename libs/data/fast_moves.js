@@ -1,7 +1,12 @@
 /**
  * List of all fast moves in the game, with their stats.
- * @property {int} duration           - The duration of the move in milliseconds
- * @property {} energy_delta
+ * @property {int} duration              - The duration of the move in milliseconds
+ * @property {int} energy_delta          - The amount of energy gained or lost when using the move
+ * @property {int} move_id               - The unique identifier for the move
+ * @property {string} name               - The name of the move
+ * @property {int} power                 - The base power of the move
+ * @property {float} stamina_loss_scaler - The scaler for stamina loss when using the move
+ * @property {string} type               - The type of the move (e.g., "Fire", "Water", etc.)
  */
 
 const fast_moves =
