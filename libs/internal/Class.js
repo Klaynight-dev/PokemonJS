@@ -127,3 +127,15 @@ export class Pokemon {
     }
 }
 
+class Type{
+    static all_types = [];
+    constructor(type_name, efficiency){
+        this.type_name = type_name;
+        this.efficiency = efficiency;
+        Type.all_types.push([type_name, efficiency]);
+    }
+
+    toString(){
+        return this.type_name + ' : '
+    }
+}
