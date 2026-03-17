@@ -1,5 +1,11 @@
 /**
- * 
+ * List of all Pokemon in the game, with their stats.
+ * @property {int}      base_attack    - The base attack stat of the Pokemon
+ * @property {int}      base_defense   - The base defense stat of the Pokemon
+ * @property {int}      base_stamina   - The base stamina stat of the Pokemon
+ * @property {string}   form           - The form of the Pokemon (e.g., "Normal")
+ * @property {int}      pokemon_id     - The unique identifier for the Pokemon
+ * @property {string}   pokemon_name   - The name of the Pokemon
  */
 
 const pokemons =

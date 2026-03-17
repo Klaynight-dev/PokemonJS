@@ -1,3 +1,25 @@
+/**
+ * List of all type effectiveness in the game, with their stats.
+ * @property {float}  Bug
+ * @property {float}  Dark
+ * @property {float}  Dragon
+ * @property {float}  Electric
+ * @property {float}  Fairy
+ * @property {float}  Fighting
+ * @property {float}  Fire
+ * @property {float}  Flying
+ * @property {float}  Ghost
+ * @property {float}  Grass
+ * @property {float}  Ground
+ * @property {float}  Ice
+ * @property {float}  Normal
+ * @property {float}  Poison
+ * @property {float}  Psychic
+ * @property {float}  Rock
+ * @property {float}  Steel
+ * @property {float}  Water
+ */
+
 const type_effectiveness =
 {
     "Bug": {
