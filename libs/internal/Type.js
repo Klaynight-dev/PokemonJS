@@ -1,12 +1,13 @@
 class Type{
-    static all_types=[]
+    static all_types = [];
     constructor(type_name, efficiency){
         this.type_name = type_name;
         this.efficiency = efficiency;
+        Type.all_types.push([type_name, efficiency]);
     }
 
     toString(){
-
+        return this.type_name + ' : '
     }
 
 //     Bug : 1.6 = [Dark, Grass, Psychic], 1.0 = [Bug, Dragon, Electric,
@@ -14,6 +15,13 @@ class Type{
 // Flying, Ghost, Poison, Steel]
 }
 
-import type_effectiveness from '../data/type_effectiveness.js';
+import * as type_effectiveness from '../data/type_effectiveness.js';
 
-console.log(type_effectiveness);
+function fillTypes(data){
+    let tab = [];
+    for (let nType in data){
+        tab.push(new Type(Object.keys(type_effectiveness['type_effectiveness'])[nType], Object.values(Object.values(type_effectiveness['type_effectiveness']))[nType]));
+    }
+    return tab;
+}
+console.log(fillTypes(type_effectiveness['type_effectiveness']));
