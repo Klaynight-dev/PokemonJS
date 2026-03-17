@@ -134,8 +134,8 @@ export class Pokemon {
 export class Type{
     static all_types = [];
     constructor(type_name, efficiency){
-        this.type_name = type_name;
-        this.efficiency = efficiency;
+        this._type_name = type_name;
+        this._efficiency = efficiency;
         Type.all_types.push([type_name, efficiency]);
     }
 
@@ -143,10 +143,19 @@ export class Type{
         return this.type_name + ' : '
     }
 
+    static fillTypes(data){
+        for (let nType in data){
+            new Type(Object.keys(data)[nType], Object.values(Object.values(data))[nType]);
+        }
+    }
     get type_name() {
         return this._type_name;
     }
     get efficiency() {
         return this._efficiency;
+    }
+
+    static get all_types() {
+        return Type.all_types;
     }
 }

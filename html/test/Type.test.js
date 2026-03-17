@@ -1,10 +1,4 @@
-import * as type_effectiveness from '../data/type_effectiveness.js';
+import * as truc from './import.test.js';
 
-function fillTypes(data){
-    let tab = [];
-    for (let nType in data){
-        tab.push(new Type(Object.keys(type_effectiveness['type_effectiveness'])[nType], Object.values(Object.values(type_effectiveness['type_effectiveness']))[nType]));
-    }
-    return tab;
-}
-console.log(fillTypes(type_effectiveness['type_effectiveness']));
+truc.Type.fillTypes(truc.type_effectiveness['type_effectiveness']);
+console.table(Object.values(truc.Type.all_types));
