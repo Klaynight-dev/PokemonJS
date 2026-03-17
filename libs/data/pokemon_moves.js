@@ -1,3 +1,14 @@
+/**
+ * List of all moves in the game, with their stats and which Pokemon can learn them.
+ * @property {string[]} charged_moves        - The list of charged moves that the Pokemon can learn
+ * @property {string[]} elite_charged_moves  - Not used
+ * @property {string[]} elite_fast_moves     - Not used
+ * @property {string[]} fast_moves           - The list of fast moves that the Pokemon can learn
+ * @property {string}   form                 - The form of the Pokemon (e.g., "Normal", "Alola", etc.)
+ * @property {int}      pokemon_id           - The unique identifier for the Pokemon
+ * @property {string}   pokemon_name         - The name of the Pokemon
+ */
+
 const pokemon_moves =
     [
         {

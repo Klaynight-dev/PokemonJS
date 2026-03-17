@@ -1,13 +1,13 @@
 /**
  * List of charged moves available in the game
- * @property {float} critical_chance     - The chance of a critical hit
- * @property {int} duration              - The duration of the move in milliseconds
- * @property {int} energy_delta          - The amount of energy gained or lost when using the move
- * @property {int} move_id               - The unique identifier for the move
- * @property {string} name               - The name of the move
- * @property {int} power                 - The power of the move
- * @property {float} stamina_loss_scaler - The scaler for stamina loss
- * @property {string} type               - The type of the move
+ * @property {float}  critical_chance      - The chance of a critical hit
+ * @property {int}    duration             - The duration of the move in milliseconds
+ * @property {int}    energy_delta         - The amount of energy gained or lost when using the move
+ * @property {int}    move_id              - The unique identifier for the move
+ * @property {string} name                 - The name of the move
+ * @property {int}    power                - The power of the move
+ * @property {float}  stamina_loss_scaler  - The scaler for stamina loss
+ * @property {string} type                 - The type of the move
  */
 
 const charged_moves =
