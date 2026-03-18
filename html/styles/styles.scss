@@ -6,13 +6,18 @@
 body {
     font-family: system-ui, sans-serif;
     padding: 1rem;
-    background: #f5f5f5;
+    background: #424951;
     color: #111;
     overflow: hidden;
 }
 
 h1 {
     margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #696969;
+    text-shadow: 0 2px 8px rgba(45, 114, 252, 0.08), 0 1px 0 #fff;
 }
 
 .controls {
@@ -25,16 +30,16 @@ h1 {
         display: inline-block;
         padding: 0.45rem 0.75rem;
         text-decoration: none;
-        border-radius: 5px;
-        background: #0078d4;
+        border-radius: 5em;
+        background: #4d4d4d;
         color: white;
         font-weight: 600;
-        border: 1px solid rgba(0, 0, 0, 0.2);
+        border: 3px solid rgb(152, 152, 152);
         transition: background 0.15s ease;
-        
-        :hover {
-        background: #005a9e;
-        }
+    }
+
+    a:hover {
+        background: #404040;
     }
 }
 
@@ -53,8 +58,8 @@ textarea {
     white-space: pre-wrap;
     border: 1px solid #333;
     resize: none;
-    
-    :focus {
-        outline: none;
-    }
+}
+
+textarea:focus {
+    outline: none;
 }
