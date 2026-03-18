@@ -21,14 +21,6 @@ import * as Class from './import.test.js';
  * @returns {void}
  */
 function testPokemonToString() {
-    Class.Attack.fill_attacks(Class.fast_moves);
-    // console.table(Class.Attack.all_attacks);
-    Class.Attack.fill_attacks(Class.charged_moves);
-    // console.table(Class.Attack.all_attacks);
-
-    // const attack1 = Class.Attack.all_attacks[0];
-    // console.log(attack1.toString());
-
     let index=0;
     for (const attack of Class.Attack.all_attacks) {
         index++;
@@ -58,10 +50,15 @@ function getPokemonsByType(typeName) {
  */
 function getPokemonsByAttack(attackName) {
     console.log("Pokémons pouvant apprendre l'attaque " + attackName + " :");
-    for (const pokemon of Class.Pokemon.all_pokemons) {
-        if (pokemon.getAttacks().includes(attackName)) {
-            console.log("- " + pokemon.name);
-        }
+    const learners = Class.Pokemon.all_pokemons.filter(p => p.getAttacks().some(a => a.name === attackName));
+
+    if (learners.length === 0) {
+        console.log("Aucun Pokémon ne peut apprendre l'attaque " + attackName);
+        return;
+    }
+
+    for (const pokemon of learners) {
+        console.log("- " + pokemon.name);
     }
 }
 
@@ -72,10 +69,13 @@ function getPokemonsByAttack(attackName) {
  */
 function getAttacksByType(typeName) {
     console.log("Attaques de type " + typeName + " :");
-    for (const attack of Class.Attack.all_attacks) {
-        if (attack.type === typeName) {
-            console.log("- " + attack.name);
-        }
+    const matches = Class.Attack.all_attacks.filter(attack => attack.type === typeName);
+    if (matches.length === 0) {
+        console.log("Aucune attaque de type " + typeName);
+        return;
+    }
+    for (const attack of matches) {
+        console.log("- " + attack.name);
     }
 }
 
@@ -105,16 +105,16 @@ function sortPokemonsByTypeThenName() {
  * @returns {void}
  */
 function getWeaknessesEnemies(attackName) {
-    const pokemon = Class.Pokemon.all_pokemons.find(p => p.getAttacks().includes(attackName));
+    const pokemon = Class.Pokemon.all_pokemons.find(p => p.getAttacks().some(a => a.name === attackName));
     if (!pokemon) {
         console.log("Aucun Pokémon ne peut apprendre l'attaque " + attackName);
         return;
     }
     const weaknesses = [];
     for (const type of pokemon.getTypes()) {
-        const typeData = Class.type_effectiveness.find(t => t.type === type);
-        if (typeData) {
-            for (const [enemyType, multiplier] of Object.entries(typeData.effectiveness)) {
+        const effectiveness = Class.type_effectiveness[type];
+        if (effectiveness) {
+            for (const [enemyType, multiplier] of Object.entries(effectiveness)) {
                 if (multiplier > 1 && !weaknesses.includes(enemyType)) {
                     weaknesses.push(enemyType);
                 }
@@ -127,5 +127,80 @@ function getWeaknessesEnemies(attackName) {
     }
 }
 
+/**
+ * Affiche la meilleure attaque rapide contre un Pokémon ennemi donné.
+ * @param {Boolean} print 
+ * @param {String} pokemonName 
+ */
+function getBestFastAttackForEnemy(print, pokemonName) {
+    if (print) {
+        const pokemon = Class.Pokemon.all_pokemons.find(p => p.name === pokemonName);
+        if (!pokemon) {
+            console.log("Aucun Pokémon trouvé avec le nom " + pokemonName);
+            return;
+        }
+        const weaknesses = [];
+        for (const type of pokemon.getTypes()) {
+            const effectiveness = Class.type_effectiveness[type];
+            if (effectiveness) {
+                for (const [enemyType, multiplier] of Object.entries(effectiveness)) {
+                    if (multiplier > 1 && !weaknesses.includes(enemyType)) {
+                        weaknesses.push(enemyType);
+                    }
+                }
+            }
+        }
+    } else {
+        return;
+    }
+}
 
-testPokemonToString();
+Class.Attack.fill_attacks(Class.fast_moves);
+// console.table(Class.Attack.all_attacks);
+Class.Attack.fill_attacks(Class.charged_moves);
+// console.table(Class.Attack.all_attacks);
+
+/**
+ * Function pour remplir la liste des Pokémons à partir des données importées, en associant les attaques correspondantes à chaque Pokémon en fonction de leurs noms.
+ * Cette fonction utilise les données des Pokémons, des attaques rapides et des attaques chargées pour créer des instances de la classe Pokemon avec les attaques correspondantes.
+ * @returns {void}
+ */
+function fillPokemons() {
+    Class.Pokemon.all_pokemons.length = 0;
+
+    const attackByName = new Map(Class.Attack.all_attacks.map(a => [a.name, a]));
+
+    for (const poke of Class.pokemons) {
+        const moves = Class.pokemon_moves.find(m => m.pokemon_id === poke.pokemon_id && m.form === poke.form);
+        const moveNames = [
+            ...(moves?.fast_moves ?? []),
+            ...(moves?.charged_moves ?? [])
+        ];
+        const attacks = moveNames
+            .map(name => attackByName.get(name))
+            .filter(Boolean);
+
+        new Class.Pokemon(
+            poke.pokemon_id,
+            poke.pokemon_name,
+            poke.form,
+            poke.base_attack,
+            poke.base_defense,
+            poke.base_stamina,
+            attacks
+        );
+    }
+}
+
+fillPokemons();
+
+// const attack1 = Class.Attack.all_attacks[0];
+// console.log(attack1.toString());
+
+// testPokemonToString();
+getPokemonsByType("Fire");
+getPokemonsByAttack("Flamethrower");
+getAttacksByType("Fire");
+sortPokemonsByTypeThenName();
+getWeaknessesEnemies("Flamethrower");
+getBestFastAttackForEnemy(true, "Bulbasaur");
