@@ -14,14 +14,14 @@ export class Attack {
          * @property {boolean} isCriticalAttack    - Indicates whether the move is a critical attack
          * @function Attack.fill_attacks(data)     - A static method to fill the list of all attacks from a data array
          */
-        this.id = move_id;
-        this.name = name;
-        this.type = type;
-        this.power = power;
-        this.duration = duration;
-        this.energy_delta = energy_delta;
-        this.critical_chance = critical_chance;
-        this.stamina_loss_scaler = stamina_loss_scaler;
+        this._id = move_id;
+        this._name = name;
+        this._type = type;
+        this._power = power;
+        this._duration = duration;
+        this._energy_delta = energy_delta;
+        this._critical_chance = critical_chance;
+        this._stamina_loss_scaler = stamina_loss_scaler;
         this.isCriticalAttack = critical_chance > 0;
         Attack.all_attacks.push(this);
     }
@@ -32,6 +32,11 @@ export class Attack {
     }
 
     static fill_attacks(data) {
+        if (!data || typeof data[Symbol.iterator] !== 'function') {
+            console.error('fill_attacks attend un itérable mais a reçu :', data);
+            return;
+        }
+
         for (const attack_data of data) {
             new Attack(attack_data.critical_chance, attack_data.duration, attack_data.energy_delta,
                 attack_data.move_id, attack_data.name, attack_data.power, attack_data.stamina_loss_scaler,

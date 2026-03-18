@@ -8,7 +8,7 @@
  * @property {string}   pokemon_name   - The name of the Pokemon
  */
 
-const pokemons =
+export const pokemons =
     [
         {
             "base_attack": 118,

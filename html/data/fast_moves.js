@@ -9,7 +9,7 @@
  * @property {string} type                 - The type of the move (e.g., "Fire", "Water", etc.)
  */
 
-const fast_moves =
+export const fast_moves =
     [
         {
             "duration": 400,

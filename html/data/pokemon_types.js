@@ -6,7 +6,7 @@
  * @property {string[]} type           - The types of the Pokemon (e.g., ["Poison, Grass"])
  */
 
-const pokemon_types =
+export const pokemon_types =
     [
         {
             "form": "Fall_2019",
