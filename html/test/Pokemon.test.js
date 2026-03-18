@@ -35,10 +35,14 @@ function testPokemonToString() {
  * @returns {void}
  */
 function getPokemonsByType(typeName) {
+    const temp = [];
     console.log("Pokémons de type " + typeName + " :");
     for (const pokemon of Class.Pokemon.all_pokemons) {
         if (pokemon.getTypes().includes(typeName)) {
-            console.log("- " + pokemon.name);
+            if (!temp.includes(pokemon.name)) {
+                temp.push(pokemon.name);
+                console.log("- " + pokemon.name);
+            }
         }
     }
 }
@@ -49,6 +53,7 @@ function getPokemonsByType(typeName) {
  * @returns {void}
  */
 function getPokemonsByAttack(attackName) {
+    const temp = [];
     console.log("Pokémons pouvant apprendre l'attaque " + attackName + " :");
     const learners = Class.Pokemon.all_pokemons.filter(p => p.getAttacks().some(a => a.name === attackName));
 
@@ -58,7 +63,10 @@ function getPokemonsByAttack(attackName) {
     }
 
     for (const pokemon of learners) {
-        console.log("- " + pokemon.name);
+        if (!temp.includes(pokemon.name)) {
+            temp.push(pokemon.name);
+            console.log("- " + pokemon.name);
+        }
     }
 }
 
