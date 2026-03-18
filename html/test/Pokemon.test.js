@@ -182,6 +182,75 @@ function getBestFastAttackForEnemy(print, pokemonName) {
     return { atk: best.attack, pts: best.dps, eff: best.multiplier };
 }
 
+/**
+ * Simule un combat entre deux Pokémons en utilisant des attaques rapides.
+ * Affiche dans la console le déroulement du combat sous la forme d'un tableau.
+ *
+ * @param {string} pokemonNameA - Nom du premier Pokémon (commence le combat).
+ * @param {string} pokemonNameB - Nom du second Pokémon.
+ * @returns {void}
+ */
+function fastFight(pokemonNameA, pokemonNameB) {
+    const pokemonA = Class.Pokemon.all_pokemons.find(p => p.name === pokemonNameA);
+    const pokemonB = Class.Pokemon.all_pokemons.find(p => p.name === pokemonNameB);
+
+    if (!pokemonA || !pokemonB) {
+        console.log(`Pokémon introuvable : ${!pokemonA ? pokemonNameA : pokemonNameB}`);
+        return;
+    }
+
+    const initialHpA = pokemonA.base_stamina;
+    const initialHpB = pokemonB.base_stamina;
+
+    let hpA = initialHpA;
+    let hpB = initialHpB;
+    const log = [];
+
+    const damageCalc = (attacker, defender, attack, multiplier) => {
+        const raw = 0.5 * attacker.base_attack * attack.power / defender.base_defense * multiplier;
+        return Math.max(1, Math.floor(raw) + 1);
+    };
+
+    let turn = 1;
+    let attacker = pokemonA;
+    let defender = pokemonB;
+    let attackerHp = hpA;
+    let defenderHp = hpB;
+
+    while (turn <= 100 && attackerHp > 0 && defenderHp > 0) {
+        const bestAttack = getBestFastAttackForEnemy(false, defender.name);
+        if (!bestAttack || !bestAttack.atk) {
+            console.log("Impossible de déterminer l'attaque rapide pour le combat.");
+            break;
+        }
+
+        const damage = damageCalc(attacker, defender, bestAttack.atk, bestAttack.eff);
+        defenderHp = Math.max(0, defenderHp - damage);
+
+        log.push({
+            Tour: turn,
+            Attaquant: attacker.name,
+            ATK: attacker.base_attack,
+            Défenseur: defender.name,
+            DEF: defender.base_defense,
+            "Nom Attaque": bestAttack.atk.name,
+            Efficacité: bestAttack.eff.toFixed(2),
+            Dégâts: damage,
+            Reste: defenderHp
+        });
+
+        if (defenderHp <= 0) {
+            break;
+        }
+
+        [attacker, defender] = [defender, attacker];
+        [attackerHp, defenderHp] = [defenderHp, attackerHp];
+        turn += 1;
+    }
+
+    console.table(log);
+}
+
 
 
 
@@ -237,3 +306,4 @@ fillPokemons();
 // sortPokemonsByTypeThenName();
 // getWeaknessesEnemies("Flamethrower");
 // getBestFastAttackForEnemy(true, "Bulbasaur");
+fastFight("Bulbasaur", "Charmander");
