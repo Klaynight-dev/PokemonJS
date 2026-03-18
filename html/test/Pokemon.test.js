@@ -201,6 +201,6 @@ fillPokemons();
 getPokemonsByType("Fire");
 getPokemonsByAttack("Flamethrower");
 getAttacksByType("Fire");
-sortPokemonsByTypeThenName();
+// sortPokemonsByTypeThenName();
 getWeaknessesEnemies("Flamethrower");
 getBestFastAttackForEnemy(true, "Bulbasaur");
