@@ -141,18 +141,55 @@ export class Type{
     constructor(type_name, efficiency){
         this._type_name = type_name;
         this._efficiency = efficiency;
-        Type.all_types.push([type_name, efficiency]);
+        Type.all_types.push(this);
+    }
+
+    static typeName(number){
+        return Type.all_types[number].type_name;
     }
 
     toString(){
-        return this.type_name + ' : '
+        return this._type_name + ' : ' + this.sortEfficencies();
+    }
+
+    sortEfficencies(){
+        let result = [];
+        let finalResult = [];
+        let temp=[];
+        for (let elem in this._efficiency){
+            if (!temp.includes(this._efficiency[elem])){
+                result[temp.length] = [];
+                result[temp.length][1] = Type.typeName(elem);
+                result[temp.length][0] = this._efficiency[elem];
+                temp.push(this._efficiency[elem]);
+            }else{
+                result[temp.indexOf(this._efficiency[elem])][1]+= ', ' + Type.typeName(elem);
+            }
+        }
+        finalResult = '';
+        for (let elem in result){
+            console.log(elem);
+            if (elem != 0){
+                finalResult+= ', ';
+            }
+            finalResult+= result.sort().reverse()[elem][0] + ' = [' + result.sort().reverse()[elem][1] + ']'
+        }
+        return finalResult;
     }
 
     static fillTypes(data){
+        let i=0;
         for (let nType in data){
-            new Type(Object.keys(data)[nType], Object.values(Object.values(data))[nType]);
+            new Type(nType, Object.values(Object.values(data)[i++]));
         }
     }
+
+    static get all_types(){
+        for (let nType in Type.all_types){
+            nType.toString();
+        }
+    }
+
     get type_name() {
         return this._type_name;
     }
