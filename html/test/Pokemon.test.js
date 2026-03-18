@@ -242,9 +242,9 @@ function fastFight(pokemonNameA, pokemonNameB) {
             Défenseur: defender.name,
             DEF: defender.base_defense,
             "Nom Attaque": bestAttack.atk.name,
-            Efficacité: bestAttack.eff.toFixed(2),
+            Effect: bestAttack.eff.toFixed(2),
             Dégâts: damage,
-            Reste: defenderHp
+            Reste: defenderHp   
         });
 
         if (defenderHp <= 0) {

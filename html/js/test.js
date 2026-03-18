@@ -17,6 +17,7 @@ const originalConsole = {
   info: console.info.bind(console),
   warn: console.warn.bind(console),
   error: console.error.bind(console),
+  table: console.table ? console.table.bind(console) : null,
 };
 
 const createConsoleProxy = () => {
@@ -38,6 +39,38 @@ const createConsoleProxy = () => {
   console.error = (...args) => {
     originalConsole.error(...args);
     appendLine(args.join(' '), 'error');
+  };
+
+  const formatTable = (data) => {
+    try {
+      if (Array.isArray(data)) {
+        if (data.length === 0) return '(empty array)';
+        const keys = Array.from(data.reduce((s, r) => {
+          if (r && typeof r === 'object') Object.keys(r).forEach(k => s.add(k));
+          return s;
+        }, new Set()));
+        const rows = data.map(row => keys.map(k => {
+          const v = row && Object.prototype.hasOwnProperty.call(row, k) ? row[k] : '';
+          return (typeof v === 'object') ? JSON.stringify(v) : String(v);
+        }));
+        const header = keys.join('\t|\t');
+        const lines = rows.map(r => r.join('\t|\t'));
+        return header + '\n' + lines.join('\n');
+      }
+      if (data && typeof data === 'object') {
+        return Object.entries(data).map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`).join('\n');
+      }
+      return String(data);
+    } catch (e) {
+      return String(data);
+    }
+  };
+
+  console.table = (...args) => {
+    if (originalConsole.table) originalConsole.table(...args);
+    const data = args[0];
+    const text = formatTable(data);
+    appendLine('\n' + text, 'log');
   };
 };
 
