@@ -130,30 +130,63 @@ function getWeaknessesEnemies(attackName) {
 /**
  * Affiche la meilleure attaque rapide contre un Pokémon ennemi donné.
  * @param {Boolean} print 
- * @param {String} pokemonName 
+ * @param {String} pokemonName
+ * @return {Object} Un objet contenant l'attaque rapide la plus efficace, les points de dégâts par seconde (DPS) et le multiplicateur d'efficacité contre le Pokémon ennemi. 
  */
 function getBestFastAttackForEnemy(print, pokemonName) {
-    if (print) {
-        const pokemon = Class.Pokemon.all_pokemons.find(p => p.name === pokemonName);
-        if (!pokemon) {
+    const pokemon = Class.Pokemon.all_pokemons.find(p => p.name === pokemonName);
+    if (!pokemon) {
+        if (print) {
             console.log("Aucun Pokémon trouvé avec le nom " + pokemonName);
-            return;
         }
-        const weaknesses = [];
-        for (const type of pokemon.getTypes()) {
-            const effectiveness = Class.type_effectiveness[type];
-            if (effectiveness) {
-                for (const [enemyType, multiplier] of Object.entries(effectiveness)) {
-                    if (multiplier > 1 && !weaknesses.includes(enemyType)) {
-                        weaknesses.push(enemyType);
-                    }
-                }
-            }
-        }
-    } else {
         return;
     }
+
+    const fastMoveIds = new Set(Class.fast_moves.map(m => m.move_id));
+    const fastMoves = Class.Attack.all_attacks.filter(a => fastMoveIds.has(a.id));
+    if (fastMoves.length === 0) {
+        if (print) {
+            console.log("Aucune attaque rapide disponible.");
+        }
+        return;
+    }
+
+    const defenderTypes = pokemon.getTypes();
+    const best = fastMoves.reduce((bestSoFar, attack) => {
+        let multiplier = 1;
+        for (const defType of defenderTypes) {
+            const effectiveness = Class.type_effectiveness[defType];
+            if (effectiveness && typeof effectiveness[attack.type] === 'number') {
+                multiplier *= effectiveness[attack.type];
+            }
+        }
+        const dps = (attack.power * multiplier) / (attack.duration / 1000);
+        if (!bestSoFar || dps > bestSoFar.dps) {
+            return { attack, multiplier, dps };
+        }
+        return bestSoFar;
+    }, null);
+
+    if (!best) {
+        if (print) {
+            console.log("Impossible de déterminer la meilleure attaque rapide.");
+        }
+        return;
+    }
+
+    if (print) {
+        console.log(`Meilleure attaque rapide contre ${pokemonName} : ${best.attack.name} (${best.attack.type})`);
+        console.log(`  Puissance: ${best.attack.power}, Multiplicateur: ${best.multiplier.toFixed(2)}, DPS: ${best.dps.toFixed(2)}`);
+    }
+
+    return { atk: best.attack, pts: best.dps, eff: best.multiplier };
 }
+
+
+
+
+
+//=================================================================================\\
 
 Class.Attack.fill_attacks(Class.fast_moves);
 // console.table(Class.Attack.all_attacks);
@@ -198,9 +231,9 @@ fillPokemons();
 // console.log(attack1.toString());
 
 // testPokemonToString();
-getPokemonsByType("Fire");
-getPokemonsByAttack("Flamethrower");
-getAttacksByType("Fire");
+// getPokemonsByType("Fire");
+// getPokemonsByAttack("Flamethrower");
+// getAttacksByType("Fire");
 // sortPokemonsByTypeThenName();
-getWeaknessesEnemies("Flamethrower");
-getBestFastAttackForEnemy(true, "Bulbasaur");
+// getWeaknessesEnemies("Flamethrower");
+// getBestFastAttackForEnemy(true, "Bulbasaur");
