@@ -306,4 +306,16 @@ fillPokemons();
 // sortPokemonsByTypeThenName();
 // getWeaknessesEnemies("Flamethrower");
 // getBestFastAttackForEnemy(true, "Bulbasaur");
-fastFight("Bulbasaur", "Charmander");
+// fastFight("Bulbasaur", "Charmander");
+
+export {
+  testPokemonToString,
+  getPokemonsByType,
+  getPokemonsByAttack,
+  getAttacksByType,
+  sortPokemonsByTypeThenName,
+  getWeaknessesEnemies,
+  getBestFastAttackForEnemy,
+  fastFight,
+  fillPokemons
+};
