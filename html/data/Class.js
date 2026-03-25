@@ -74,7 +74,7 @@ export class Attack {
 export class Pokemon {
     static all_pokemons = [];
 
-    constructor(pokemon_id, pokemon_name, form, base_attack, base_defense, base_stamina, charged_attacks) {
+    constructor(pokemon_id, pokemon_name, form, base_attack, base_defense, base_stamina, charged_attacks, types = []) {
         this._id = pokemon_id;
         this._name = pokemon_name;
         this._form = form;
@@ -82,6 +82,7 @@ export class Pokemon {
         this._base_defense = base_defense;
         this._base_stamina = base_stamina;
         this._charged_attacks = charged_attacks;
+        this._types = Array.isArray(types) ? types : [];
         Pokemon.all_pokemons.push(this);
     }
 
@@ -93,9 +94,12 @@ export class Pokemon {
     }
 
     getTypes() {
+        if (Array.isArray(this._types) && this._types.length > 0) {
+            return this._types.slice().sort();
+        }
         const types = [];
         for (const attack of this.charged_attacks) {
-            if (!types.includes(attack.type)) {
+            if (attack && attack.type && !types.includes(attack.type)) {
                 types.push(attack.type);
             }
         }
