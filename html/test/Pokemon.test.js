@@ -275,7 +275,7 @@ Class.Attack.fill_attacks(Class.charged_moves);
  * Cette fonction utilise les données des Pokémons, des attaques rapides et des attaques chargées pour créer des instances de la classe Pokemon avec les attaques correspondantes.
  * @returns {void}
  */
-function fillPokemons() {
+function fill_Pokemons() {
     Class.Pokemon.all_pokemons.length = 0;
 
     const attackByName = new Map(Class.Attack.all_attacks.map(a => [a.name, a]));
@@ -302,7 +302,7 @@ function fillPokemons() {
     }
 }
 
-fillPokemons();
+fill_Pokemons();
 
 // const attack1 = Class.Attack.all_attacks[0];
 // console.log(attack1.toString());
@@ -325,5 +325,5 @@ export {
   getWeaknessesEnemies,
   getBestFastAttackForEnemy,
   fastFight,
-  fillPokemons
+  fill_Pokemons
 };
