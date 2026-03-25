@@ -1,4 +1,4 @@
-import * as Tests from '../test/verif.js';
+import * as Tests from '../test/test.js';
 
 const outputEl = document.getElementById('console');
 

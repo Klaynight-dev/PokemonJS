@@ -1,5 +1,5 @@
 import * as Class from '../test/import.test.js';
-import * as PokeFonctions from '../test/verif.js';
+import * as PokeFonctions from '../test/test.js';
 
 
 /**
