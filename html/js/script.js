@@ -42,7 +42,7 @@ function createPokemonTable(pokemons) {
 
         // Generation
         const tdGen = document.createElement('td');
-        tdGen.textContent = pokemon.generation;
+        tdGen.textContent = pokemon.form ?? pokemon.generation ?? '';
         row.appendChild(tdGen);
 
         // Types
@@ -53,17 +53,17 @@ function createPokemonTable(pokemons) {
 
         // Stamina
         const tdStamina = document.createElement('td');
-        tdStamina.textContent = pokemon.stamina;
+        tdStamina.textContent = pokemon.base_stamina ?? pokemon.stamina ?? '';
         row.appendChild(tdStamina);
 
         // Attack
         const tdAttack = document.createElement('td');
-        tdAttack.textContent = pokemon.attack;
+        tdAttack.textContent = pokemon.base_attack ?? pokemon.attack ?? '';
         row.appendChild(tdAttack);
 
         // Defense
         const tdDefense = document.createElement('td');
-        tdDefense.textContent = pokemon.defense;
+        tdDefense.textContent = pokemon.base_defense ?? pokemon.defense ?? '';
         row.appendChild(tdDefense);
 
         // Image
