@@ -74,7 +74,7 @@ export class Attack {
 export class Pokemon {
     static all_pokemons = [];
 
-    constructor(pokemon_id, pokemon_name, form, base_attack, base_defense, base_stamina, charged_attacks, types = []) {
+    constructor(pokemon_id, pokemon_name, form, base_attack, base_defense, base_stamina, charged_attacks, fast_attacks, types = []) {
         this._id = pokemon_id;
         this._name = pokemon_name;
         this._form = form;
@@ -82,15 +82,19 @@ export class Pokemon {
         this._base_defense = base_defense;
         this._base_stamina = base_stamina;
         this._charged_attacks = charged_attacks;
+        this._fast_attacks = fast_attacks;
         this._types = Array.isArray(types) ? types : [];
         Pokemon.all_pokemons.push(this);
     }
 
     toString() {
-        return this.name + " : #" + this.id + ", " + this.form
-        + ", [" + this.base_attack + " ATK, " + this.base_defense + " DEF, "
-        + this.base_stamina + " STA], Rapides = " + this.rapidity
-        + ", Chargés = " + this.charged_attacks.length;
+        return this.name + " : #" + this.id + ", " + this.getTypesStyled()
+        + ", [STA: " + this.base_stamina + ', ATK: ' + this.base_attack + ', DEF: ' + this.base_defense + 
+        "], Rapides = " + this.fast_attacks
+        + ", Chargés = " + this.charged_attacks;
+
+        
+
     }
 
     getTypes() {
@@ -104,6 +108,15 @@ export class Pokemon {
             }
         }
         return types;
+    }
+
+    getTypesStyled() {
+        let types = this.getTypes();
+        if (types.length < 2){
+            return '[' + types[1] + ']';
+        }else{
+            return '[' + types[0] + ', ' + types[1] + ']';
+        }
     }
 
     getAttacks() {

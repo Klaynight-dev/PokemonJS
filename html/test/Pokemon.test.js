@@ -190,6 +190,7 @@ function getBestFastAttackForEnemy(print, pokemonName) {
     return { atk: best.attack, pts: best.dps, eff: best.multiplier };
 }
 
+
 /**
  * Simule un combat entre deux Pokémons en utilisant des attaques rapides.
  * Affiche dans la console le déroulement du combat sous la forme d'un tableau.
@@ -310,6 +311,9 @@ function fill_Pokemons() {
 
 Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
 fill_Pokemons();
+console.log(Class.Pokemon.all_pokemons[0].toString());
+console.log(Class.Pokemon.all_pokemons[0].getTypes());
+
 
 // const attack1 = Class.Attack.all_attacks[0];
 // console.log(attack1.toString());
