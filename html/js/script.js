@@ -115,8 +115,11 @@ function createPokemonTable(pokemons) {
             }
         }
 
-        // initial
-        applyVariant(group.variants[0]);
+        // initial: prefer la forme "Normal" si présente
+        const normalIdx = group.variants.findIndex(v => (v.form ?? v.forme ?? '').toLowerCase() === 'normal');
+        const initIdx = normalIdx >= 0 ? normalIdx : 0;
+        select.selectedIndex = initIdx;
+        applyVariant(group.variants[initIdx]);
 
         // changer la variante au changement du select
         select.addEventListener('change', e => {
