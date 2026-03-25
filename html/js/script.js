@@ -47,7 +47,8 @@ function createPokemonTable(pokemons) {
 
         // Types
         const tdTypes = document.createElement('td');
-        tdTypes.textContent = pokemon.types.join(', ');
+        const types = (pokemon.types ?? (typeof pokemon.getTypes === 'function' ? pokemon.getTypes() : undefined)) || [];
+        tdTypes.textContent = types.join(', ');
         row.appendChild(tdTypes);
 
         // Stamina
@@ -68,7 +69,7 @@ function createPokemonTable(pokemons) {
         // Image
         const tdImage = document.createElement('td');
         const img = document.createElement('img');
-        img.src = pokemon.image;
+        img.src = "./imgs/webp/images/" + (pokemon.id < 10 ? "00" + pokemon.id : pokemon.id < 100 ? "0" + pokemon.id : pokemon.id) + ".webp";
         img.alt = pokemon.name;
         img.style.height = '40px'; // Adjust as needed
         img.style.objectFit = 'contain';
@@ -84,6 +85,8 @@ function createPokemonTable(pokemons) {
 
 document.addEventListener('DOMContentLoaded', () => {
     Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
+    Class.Attack.fill_attacks(Class.fast_moves);
+    Class.Attack.fill_attacks(Class.charged_moves);
     PokeFonctions.fill_Pokemons();
     const pokemons = Class.Pokemon.all_pokemons;
     const pokemonTable = createPokemonTable(pokemons);
