@@ -61,3 +61,13 @@ textarea {
 textarea:focus {
     outline: none;
 }
+
+.pagination {
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.pokemon-container {
+    margin-top:16px;
+}
