@@ -1,3 +1,5 @@
+import * as Tests from '../test/Pokemon.test.js';
+
 const outputEl = document.getElementById('console');
 
 const createTimestamp = () => {
@@ -79,8 +81,6 @@ const clearConsole = () => {
 };
 
 createConsoleProxy();
-
-import * as Tests from '../test/Pokemon.test.js';
 
 const actions = {
   fastFight: () => Tests.fastFight('Bulbasaur', 'Charmander'),

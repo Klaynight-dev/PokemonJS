@@ -302,6 +302,8 @@ function fill_Pokemons() {
     }
 }
 
+
+Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
 fill_Pokemons();
 
 // const attack1 = Class.Attack.all_attacks[0];
