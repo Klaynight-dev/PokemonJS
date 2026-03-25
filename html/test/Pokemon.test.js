@@ -290,6 +290,10 @@ function fill_Pokemons() {
             .map(name => attackByName.get(name))
             .filter(Boolean);
 
+        // Cherche les types d'espèce correspondants dans les données `pokemon_types`
+        const typeEntry = (Class.pokemon_types || []).find(t => t.pokemon_id === poke.pokemon_id && t.form === poke.form);
+        const speciesTypes = typeEntry ? typeEntry.type : [];
+
         new Class.Pokemon(
             poke.pokemon_id,
             poke.pokemon_name,
@@ -297,7 +301,8 @@ function fill_Pokemons() {
             poke.base_attack,
             poke.base_defense,
             poke.base_stamina,
-            attacks
+            attacks,
+            speciesTypes
         );
     }
 }
