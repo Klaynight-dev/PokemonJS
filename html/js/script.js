@@ -1,4 +1,5 @@
-import * as truc from './import.test.js';
+import * as Class from '../test/import.test.js';
+import * as PokeFonctions from '../test/Pokemon.test.js';
 
 function createPokemonTable(pokemons) {
     const table = document.createElement('table');
@@ -82,7 +83,9 @@ function createPokemonTable(pokemons) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const pokemons = ;
+    Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
+    PokeFonctions.fill_Pokemons();
+    const pokemons = Class.Pokemon.all_pokemons;
     const pokemonTable = createPokemonTable(pokemons);
-    document.getElementById('pokemon-table-container').appendChild(pokemonTable);
-});
+    document.body.appendChild(pokemonTable);
+}); 
