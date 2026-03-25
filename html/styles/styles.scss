@@ -71,3 +71,62 @@ textarea:focus {
 .pokemon-container {
     margin-top:16px;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: #23272e;
+    color: #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+    th, td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+    }
+
+    th {
+        background: #2d323b;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        border-bottom: 2px solid #3a3f47;
+    }
+
+    tr {
+        transition: background 0.15s;
+    }
+
+    tr:nth-child(even) {
+        background: #262b33;
+    }
+
+    tr:hover {
+        background: #353b44;
+    }
+
+    td {
+        border-bottom: 1px solid #31363f;
+    }
+
+    select {
+        padding: 0.4rem 0.75rem;
+        border-radius: 5em;
+        border: 2px solid #444;
+        background: #23272e;
+        color: #e0e0e0;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: border-color 0.15s, background 0.15s;
+        appearance: none;
+        outline: none;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    select:focus {
+        border-color: #6c9edb;
+        background: #2d323b;
+    }
+}
