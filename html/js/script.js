@@ -1,5 +1,5 @@
 import * as Class from '../test/import.test.js';
-import * as PokeFonctions from '../test/Pokemon.test.js';
+import * as PokeFonctions from '../test/verif.js';
 
 
 /**
@@ -206,8 +206,7 @@ function createPokemonTableFromGroups(groups) {
 
         const tdImage = document.createElement('td');
         const img = document.createElement('img');
-        img.style.height = '40px';
-        img.style.objectFit = 'contain';
+        img.class = 'pokemon-image';
         tdImage.appendChild(img);
         row.appendChild(tdImage);
 
@@ -286,3 +285,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderPage(1);
 }); 
+

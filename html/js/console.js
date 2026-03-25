@@ -1,4 +1,4 @@
-import * as Tests from '../test/Pokemon.test.js';
+import * as Tests from '../test/verif.js';
 
 const outputEl = document.getElementById('console');
 

@@ -96,6 +96,7 @@ table {
 
     tr {
         transition: background 0.15s;
+        cursor: pointer;
     }
 
     tr:nth-child(even) {
@@ -108,6 +109,11 @@ table {
 
     td {
         border-bottom: 1px solid #31363f;
+
+        img {
+            height: 40px;
+            object-fit: contain;
+        }
     }
 
     select {
@@ -121,7 +127,7 @@ table {
         transition: border-color 0.15s, background 0.15s;
         appearance: none;
         outline: none;
-        cursor: pointer;
+        cursor: default;
         width: 100%;
     }
 
@@ -129,4 +135,21 @@ table {
         border-color: #6c9edb;
         background: #2d323b;
     }
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.45rem 0.75rem;
+    text-decoration: none;
+    border-radius: 5em;
+    background: #4d4d4d;
+    color: white;
+    font-weight: 600;
+    border: 3px solid rgb(152, 152, 152);
+    transition: background 0.15s ease;
+}
+
+.pageInfo {
+    font-weight: 600;
+    color: #9d9d9d;
 }
