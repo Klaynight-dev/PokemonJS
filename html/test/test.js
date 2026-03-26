@@ -282,11 +282,17 @@ function fill_Pokemons() {
 
     for (const poke of Class.pokemons) {
         const moves = Class.pokemon_moves.find(m => m.pokemon_id === poke.pokemon_id && m.form === poke.form);
-        const moveNames = [
-            ...(moves?.fast_moves ?? []),
+        const chargedMoveNames = [
             ...(moves?.charged_moves ?? [])
         ];
-        const attacks = moveNames
+        const chargedAttacks = chargedMoveNames
+            .map(name => attackByName.get(name))
+            .filter(Boolean);
+
+        const fastMoveNames = [
+            ...(moves?.fast_moves ?? [])
+        ];
+        const fastAttacks = fastMoveNames
             .map(name => attackByName.get(name))
             .filter(Boolean);
 
@@ -301,15 +307,22 @@ function fill_Pokemons() {
             poke.base_attack,
             poke.base_defense,
             poke.base_stamina,
-            attacks,
+            chargedAttacks,
+            fastAttacks,
             speciesTypes
         );
     }
 }
 
 
-Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
-fill_Pokemons();
+// fill_Pokemons();
+// console.log(Class.Pokemon.all_pokemons[0].getAttacks());
+// console.log(Class.Pokemon.all_pokemons[0].charged_attacks);
+// console.log(Class.Pokemon.all_pokemons[0].fast_attacks);
+
+
+// Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
+// fill_Pokemons();
 
 // const attack1 = Class.Attack.all_attacks[0];
 // console.log(attack1.toString());
