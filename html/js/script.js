@@ -226,18 +226,27 @@ document.addEventListener('DOMContentLoaded', () => {
     detailsOverlay.id = 'pokemon-details-overlay';
     detailsOverlay.style.display = 'none';
     detailsOverlay.innerHTML = `
-        <div class="pokemon-details">
+        <div class="pokemon-details" role="dialog" aria-modal="true">
             <button class="pokemon-details-close" aria-label="Fermer">×</button>
             <div class="pokemon-details-body">
                 <div class="pokemon-details-image"><img alt=""/></div>
                 <div class="pokemon-details-info">
-                    <h2 class="pokemon-details-title"></h2>
-                    <div class="pokemon-details-stats"></div>
-                    <div class="pokemon-details-variants"></div>
-                    <div class="pokemon-details-attacks">
-                        <h3>Attaques</h3>
-                        <div class="pokemon-attacks-table"></div>
-                    </div>
+                    <header class="details-header">
+                        <h2 class="pokemon-details-title"></h2>
+                        <nav class="details-tabs" role="tablist">
+                            <button class="tab-button active" role="tab" data-tab="overview" aria-selected="true">Overview</button>
+                            <button class="tab-button" role="tab" data-tab="attacks" aria-selected="false">Attaques</button>
+                        </nav>
+                    </header>
+                    <section class="tab-panel" data-panel="overview">
+                        <div class="pokemon-details-stats"></div>
+                        <div class="pokemon-details-variants"></div>
+                    </section>
+                    <section class="tab-panel" data-panel="attacks" hidden>
+                        <div class="pokemon-details-attacks">
+                            <div class="pokemon-attacks-table"></div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -256,6 +265,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     detailsOverlay.querySelector('.pokemon-details-close').addEventListener('click', closeDetails);
     document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeDetails(); });
+
+    // Onglets: gestion simple (Event delegation)
+    detailsOverlay.addEventListener('click', (ev) => {
+        const btn = ev.target && ev.target.closest && ev.target.closest('.tab-button');
+        if (!btn) return;
+        const tab = btn.dataset.tab;
+        if (!tab) return;
+        const tabButtons = detailsOverlay.querySelectorAll('.tab-button');
+        tabButtons.forEach(b => {
+            const active = b === btn;
+            b.classList.toggle('active', active);
+            b.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        const panels = detailsOverlay.querySelectorAll('.tab-panel');
+        panels.forEach(p => {
+            const show = p.dataset.panel === tab;
+            if (show) p.removeAttribute('hidden'); else p.setAttribute('hidden', '');
+        });
+    });
 
     function showDetailsForRow(row) {
         document.body.style.overflow = 'hidden';
@@ -277,6 +305,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // stocker l'identité affichée pour permettre des mises à jour externes
         detailsOverlay.dataset.pokemonId = String(group.id);
         detailsOverlay.dataset.pokemonName = group.name || '';
+
+        // forcer affichage de l'onglet overview par défaut
+        const tabButtons = detailsOverlay.querySelectorAll('.tab-button');
+        tabButtons.forEach(b => {
+            const isOverview = b.dataset.tab === 'overview';
+            b.classList.toggle('active', isOverview);
+            b.setAttribute('aria-selected', isOverview ? 'true' : 'false');
+        });
+        const panels = detailsOverlay.querySelectorAll('.tab-panel');
+        panels.forEach(p => {
+            if (p.dataset.panel === 'overview') p.removeAttribute('hidden'); else p.setAttribute('hidden', '');
+        });
 
         const idNum = Number(group.id);
         if (!Number.isNaN(idNum)) {
@@ -303,6 +343,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tr><th>Défense</th><td>${defense}</td></tr>
             </table>
         `;
+
+        // Pour corriger l'affichage mobile (notre media query convertit les tables en blocks),
+        // ajouter l'attribut data-label sur chaque <td> avec le texte du <th> correspondant.
+        try {
+            const statRows = statsEl.querySelectorAll('tr');
+            statRows.forEach(r => {
+                const th = r.querySelector('th');
+                const td = r.querySelector('td');
+                if (th && td) {
+                    td.setAttribute('data-label', th.textContent || '');
+                }
+            });
+        } catch (e) {
+            // silent
+        }
 
         // Afficher le tableau des attaques pour la variante sélectionnée
         if (attacksContainer) {
