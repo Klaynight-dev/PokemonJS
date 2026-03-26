@@ -1,5 +1,12 @@
 import * as Tests from '../test/test.js';
 
+/**
+ * Ce module redéfinit les méthodes de console pour les afficher dans une textarea dédiée,
+ * tout en conservant le comportement original dans la console du navigateur.
+ * Il gère les niveaux de log (log, info, warn, error) et formate les objets pour une meilleure lisibilité.
+ * Les tests sont déclenchés via des liens avec des attributs data-test, et les résultats sont affichés dans la textarea.
+ * 
+ */
 const outputEl = document.getElementById('console');
 
 const createTimestamp = () => {
