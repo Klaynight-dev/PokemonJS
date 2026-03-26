@@ -85,15 +85,19 @@ function getPokemonsByAttack(attackName) {
  * @returns {void}
  */
 function getAttacksByType(typeName) {
-    console.log("Attaques de type " + typeName + " :");
-    const matches = Class.Attack.all_attacks.filter(attack => attack.type === typeName);
+    let toPrint = [];
+    const matches = Class.Attack.all_attacks.filter(attack => attack.type.toLowerCase === typeName.toLowerCase);
     if (matches.length === 0) {
         console.log("Aucune attaque de type " + typeName);
         return;
     }
     for (const attack of matches) {
-        console.log("- " + attack.name);
+        toPrint.push(attack.toString());
     }
+    console.log("Liste des " + toPrint.length + " attaques de type " + typeName + " :");
+    toPrint.forEach(attack => {
+        console.log(attack);
+    });
 }
 
 /**
