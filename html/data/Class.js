@@ -101,13 +101,13 @@ export class Pokemon {
         if (Array.isArray(this._types) && this._types.length > 0) {
             return this._types.slice().sort();
         }
-        const types = [];
-        for (const attack of this.charged_attacks) {
-            if (attack && attack.type && !types.includes(attack.type)) {
-                types.push(attack.type);
-            }
-        }
-        return types;
+        // const types = [];
+        // for (const attack of this.charged_attacks) {
+        //     if (attack && attack.type && !types.includes(attack.type)) {
+        //         types.push(attack.type);
+        //     }
+        // }
+        // return types;
     }
 
     getTypesStyled() {
@@ -122,6 +122,11 @@ export class Pokemon {
     getAttacks() {
         const attacks = [];
         for (const attack of this.charged_attacks) {
+            if (!attacks.includes(attack)) {
+                attacks.push(attack);
+            }
+        }
+        for (const attack of this.fast_attacks) {
             if (!attacks.includes(attack)) {
                 attacks.push(attack);
             }
@@ -150,6 +155,9 @@ export class Pokemon {
     }
     get charged_attacks() {
         return this._charged_attacks;
+    }
+    get fast_attacks() {
+        return this._fast_attacks;
     }
 }
 
