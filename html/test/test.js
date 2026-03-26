@@ -36,15 +36,19 @@ function testPokemonToString() {
  */
 function getPokemonsByType(typeName) {
     const temp = [];
-    console.log("Pokémons de type " + typeName + " :");
+    let toPrint = [];
     for (const pokemon of Class.Pokemon.all_pokemons) {
-        if (pokemon.getTypes().includes(typeName)) {
-            if (!temp.includes(pokemon.name)) {
-                temp.push(pokemon.name);
-                console.log("- " + pokemon.name);
+        if (pokemon.getTypesLowerCase().includes(typeName?.toLowerCase())) {
+            if (!temp.includes(pokemon.id)) {
+                temp.push(pokemon.id);
+                toPrint.push(pokemon.toString());
             }
         }
     }
+    console.log("Liste des " + toPrint.length + " Pokémons de type " + typeName + " :");
+    toPrint.forEach(pokemon => {
+        console.log(pokemon);
+    });
 }
 
 /**
@@ -54,6 +58,7 @@ function getPokemonsByType(typeName) {
  */
 function getPokemonsByAttack(attackName) {
     const temp = [];
+    let toPrint = [];
     console.log("Pokémons pouvant apprendre l'attaque " + attackName + " :");
     const learners = Class.Pokemon.all_pokemons.filter(p => p.getAttacks().some(a => a.name === attackName));
 
@@ -63,11 +68,15 @@ function getPokemonsByAttack(attackName) {
     }
 
     for (const pokemon of learners) {
-        if (!temp.includes(pokemon.name)) {
-            temp.push(pokemon.name);
-            console.log("- " + pokemon.name);
+        if (!temp.includes(pokemon.id)) {
+            temp.push(pokemon.id);
+            toPrint.push(pokemon.toString());
         }
     }
+    console.log("Liste des " + toPrint.length + " Pokémons pouvant apprendre l'attaque " + attackName + " :");
+    toPrint.forEach(pokemon => {
+        console.log(pokemon);
+    });
 }
 
 /**
@@ -314,8 +323,9 @@ function fill_Pokemons() {
     }
 }
 
+fill_Pokemons();
 
-// fill_Pokemons();
+console.log(getPokemonsByType());
 // console.log(Class.Pokemon.all_pokemons[0].getAttacks());
 // console.log(Class.Pokemon.all_pokemons[0].charged_attacks);
 // console.log(Class.Pokemon.all_pokemons[0].fast_attacks);

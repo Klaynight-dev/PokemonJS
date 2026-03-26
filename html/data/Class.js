@@ -90,8 +90,8 @@ export class Pokemon {
     toString() {
         return this.name + " : #" + this.id + ", " + this.getTypesStyled()
         + ", [STA: " + this.base_stamina + ', ATK: ' + this.base_attack + ', DEF: ' + this.base_defense + 
-        "], Rapides = " + this.fast_attacks
-        + ", Chargés = " + this.charged_attacks;
+        "], Rapides = " + this.getAttacksStyled(this.fast_attacks)
+        + ", Chargées = " + this.getAttacksStyled(this.charged_attacks);
 
         
 
@@ -110,10 +110,18 @@ export class Pokemon {
         // return types;
     }
 
+    getTypesLowerCase(){
+        let lowerCase = []
+        this.getTypes().forEach(type => {
+            lowerCase.push(type.toLowerCase());
+        });
+        return lowerCase;
+    }
+
     getTypesStyled() {
         let types = this.getTypes();
         if (types.length < 2){
-            return '[' + types[1] + ']';
+            return '[' + types[0] + ']';
         }else{
             return '[' + types[0] + ', ' + types[1] + ']';
         }
@@ -132,6 +140,19 @@ export class Pokemon {
             }
         }
         return attacks;
+    }
+
+    getAttacksStyled(attackToStyle){
+        let attacks = "[";
+        let count = 0;
+        attackToStyle.forEach(attack => {
+            if (attackToStyle.length != ++count){
+                attacks+= attack.name + ", ";
+            }else{
+                attacks+= attack.name;
+            }
+        });
+        return attacks + "]";
     }
 
     // Getters
