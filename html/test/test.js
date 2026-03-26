@@ -60,7 +60,7 @@ function getPokemonsByAttack(attackName) {
     const temp = [];
     let toPrint = [];
     console.log("Pokémons pouvant apprendre l'attaque " + attackName + " :");
-    const learners = Class.Pokemon.all_pokemons.filter(p => p.getAttacks().some(a => a.name === attackName));
+    const learners = Class.Pokemon.all_pokemons.filter(p => p.getAttacks().some(a => a.name?.toLowerCase() === attackName?.toLowerCase()));
 
     if (learners.length === 0) {
         console.log("Aucun Pokémon ne peut apprendre l'attaque " + attackName);
