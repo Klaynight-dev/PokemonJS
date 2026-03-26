@@ -1,6 +1,22 @@
 import * as Class from '../test/import.test.js';
 import * as PokeFonctions from '../test/test.js';
 
+// Variables partagées utilisées par les fonctions définies en haut du fichier
+let groupsArray = [];
+let filteredGroups = [];
+let pageSize = 25;
+let currentPage = 1;
+let totalPages = 1;
+let container = null;
+let prevBtn = null;
+let nextBtn = null;
+let pageInfo = null;
+let typeSelect = null;
+let fastSelect = null;
+let nameInput = null;
+let preview = null;
+let detailsOverlay = null;
+
 /**
  * Construit des groupes de variantes à partir d'un tableau de Pokémon.
  * Les variantes sont regroupées par identifiant et nom de Pokémon.
@@ -57,6 +73,7 @@ function createPokemonTableFromGroups(groups) {
         const tdGen = document.createElement('td');
         tdGen.setAttribute('data-label', 'Génération');
         const select = document.createElement('select');
+        select.className = 'btn';
         group.variants.forEach((v, idx) => {
             const opt = document.createElement('option');
             const form = v.form ?? v.forme ?? v.generation ?? v.variant ?? 'Normal';
@@ -131,6 +148,301 @@ function createPokemonTableFromGroups(groups) {
     return table;
 }
 
+function showDetailsForRow(row) {
+    document.body.style.overflow = 'hidden';
+    const id = row.dataset.pokemonId;
+    const name = row.dataset.pokemonName || '';
+        const group = groupsArray.find(g => String(g.id) === String(id) && (g.name || '') === name);
+    if (!group) return;
+    const select = row.querySelector('select');
+    const idx = select ? Number(select.value || select.selectedIndex || 0) : 0;
+    const variant = group.variants[idx] || group.variants[0] || {};
+
+    const imgEl = detailsOverlay.querySelector('.pokemon-details-image img');
+    const titleEl = detailsOverlay.querySelector('.pokemon-details-title');
+    const statsEl = detailsOverlay.querySelector('.pokemon-details-stats');
+    const variantsEl = detailsOverlay.querySelector('.pokemon-details-variants');
+    const attacksContainer = detailsOverlay.querySelector('.pokemon-attacks-table');
+
+    detailsOverlay.dataset.pokemonId = String(group.id);
+    detailsOverlay.dataset.pokemonName = group.name || '';
+
+    const tabButtons = detailsOverlay.querySelectorAll('.tab-button');
+    tabButtons.forEach(b => {
+        const isOverview = b.dataset.tab === 'overview';
+        b.classList.toggle('active', isOverview);
+        b.setAttribute('aria-selected', isOverview ? 'true' : 'false');
+    });
+    const panels = detailsOverlay.querySelectorAll('.tab-panel');
+    panels.forEach(p => {
+        if (p.dataset.panel === 'overview') p.removeAttribute('hidden'); else p.setAttribute('hidden', '');
+    });
+
+    const idNum = Number(group.id);
+    if (!Number.isNaN(idNum)) {
+        const padded = idNum < 10 ? '00' + idNum : idNum < 100 ? '0' + idNum : String(idNum);
+        imgEl.src = './imgs/webp/images/' + padded + '.webp';
+        imgEl.alt = group.name || '';
+    } else {
+        imgEl.src = '';
+        imgEl.alt = group.name || '';
+    }
+
+    titleEl.textContent = `${group.id} — ${group.name || ''}`;
+
+    const types = variant.types ?? (typeof variant.getTypes === 'function' ? variant.getTypes() : undefined) ?? variant.type ?? variant.types_list ?? [];
+    const stamina = variant.base_stamina ?? variant.stamina ?? variant.hp ?? '';
+    const attack = variant.base_attack ?? variant.attack ?? '';
+    const defense = variant.base_defense ?? variant.defense ?? '';
+
+    statsEl.innerHTML = `
+        <table class="details-stats">
+            <tr><th>Types</th><td>${Array.isArray(types) ? types.join(', ') : (types || '')}</td></tr>
+            <tr><th>Endurance</th><td>${stamina}</td></tr>
+            <tr><th>Attaque</th><td>${attack}</td></tr>
+            <tr><th>Défense</th><td>${defense}</td></tr>
+        </table>
+    `;
+
+    try {
+        const statRows = statsEl.querySelectorAll('tr');
+        statRows.forEach(r => {
+            const th = r.querySelector('th');
+            const td = r.querySelector('td');
+            if (th && td) {
+                td.setAttribute('data-label', th.textContent || '');
+            }
+        });
+    } catch (e) {
+        console.warn('Error setting data-labels for stats table:', e);
+    }
+
+    if (attacksContainer) {
+        attacksContainer.innerHTML = '';
+        const attacks = (typeof variant.getAttacks === 'function') ? variant.getAttacks() : [];
+        if (attacks && attacks.length > 0) {
+            const table = document.createElement('table');
+            table.className = 'details-attacks';
+            const thead = document.createElement('thead');
+            thead.innerHTML = '<tr><th>Nom</th><th>Type</th><th>Puissance</th><th>Durée (ms)</th><th>Énergie</th><th>Catégorie</th></tr>';
+            table.appendChild(thead);
+            const tbodyAtk = document.createElement('tbody');
+
+            const fastSet = new Set((variant.fast_attacks || []).map(a => a && a.name));
+            const chargedSet = new Set((variant.charged_attacks || []).map(a => a && a.name));
+
+            attacks.forEach(a => {
+                if (!a) return;
+                const tr = document.createElement('tr');
+                const nameTd = document.createElement('td'); nameTd.textContent = a.name || '';
+                const typeTd = document.createElement('td'); typeTd.textContent = a.type || '';
+                const powerTd = document.createElement('td'); powerTd.textContent = a.power ?? '';
+                const durTd = document.createElement('td'); durTd.textContent = a.duration ?? '';
+                const engTd = document.createElement('td'); engTd.textContent = a.energy_delta ?? '';
+                const catTd = document.createElement('td');
+                const isFast = fastSet.has(a.name);
+                const isCharged = chargedSet.has(a.name);
+                catTd.textContent = isCharged && !isFast ? 'Chargée' : (isFast && !isCharged ? 'Rapide' : (isFast && isCharged ? 'Les deux' : ''));
+
+                nameTd.setAttribute('data-label', 'Nom');
+                typeTd.setAttribute('data-label', 'Type');
+                powerTd.setAttribute('data-label', 'Puissance');
+                durTd.setAttribute('data-label', 'Durée (ms)');
+                engTd.setAttribute('data-label', 'Énergie');
+                catTd.setAttribute('data-label', 'Catégorie');
+
+                tr.appendChild(nameTd);
+                tr.appendChild(typeTd);
+                tr.appendChild(powerTd);
+                tr.appendChild(durTd);
+                tr.appendChild(engTd);
+                tr.appendChild(catTd);
+                tbodyAtk.appendChild(tr);
+            });
+
+            table.appendChild(tbodyAtk);
+            attacksContainer.appendChild(table);
+        } else {
+            attacksContainer.textContent = 'Aucune attaque renseignée.';
+        }
+    }
+
+    variantsEl.innerHTML = '';
+    if (group.variants && group.variants.length > 1) {
+        const title = document.createElement('h3');
+        title.textContent = 'Variantes';
+        variantsEl.appendChild(title);
+        const ul = document.createElement('ul');
+        ul.className = 'details-variants-list';
+        group.variants.forEach((v, i) => {
+            const li = document.createElement('li');
+            li.className = 'btn';
+            const label = v.form ?? v.forme ?? v.generation ?? v.variant ?? ('Variant ' + i);
+            li.textContent = label;
+            if (i === idx) li.classList.add('active');
+            li.addEventListener('click', () => {
+                const targetSelect = row.querySelector('select');
+                if (targetSelect) {
+                    targetSelect.selectedIndex = i;
+                    const ev = new Event('change');
+                    targetSelect.dispatchEvent(ev);
+                }
+                showDetailsForRow(row);
+            });
+            ul.appendChild(li);
+        });
+        variantsEl.appendChild(ul);
+    }
+
+    detailsOverlay.style.display = 'flex';
+}
+
+function attachRowClickHandlers(root) {
+    const rows = root.querySelectorAll('tbody tr');
+    rows.forEach(r => {
+        if (r.__detailsAttached) return;
+        r.__detailsAttached = true;
+        r.addEventListener('click', (ev) => {
+            if (ev.target && (ev.target.tagName === 'SELECT' || ev.target.tagName === 'OPTION' || ev.target.tagName === 'IMG')) return;
+            showDetailsForRow(r);
+        });
+        r.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); showDetailsForRow(r); } });
+    });
+}
+
+function getLargeSrcFromSmall(src) {
+    try {
+        return src.replace('/thumbnails/', '/images/');
+    } catch (e) {
+        return src;
+    }
+}
+
+function attachPreviewHandlers(root) {
+    const imgs = root.querySelectorAll('img');
+    imgs.forEach(img => {
+        if (img.__previewAttached) return;
+        img.__previewAttached = true;
+
+        img.addEventListener('mouseenter', (ev) => {
+            const largeSrc = getLargeSrcFromSmall(img.src || '');
+            const pj = preview.querySelector('img');
+            pj.src = largeSrc;
+            pj.alt = img.alt || '';
+            preview.style.display = 'block';
+        });
+
+        img.addEventListener('mousemove', (ev) => {
+            const offsetX = 12;
+            const offsetY = 18;
+            const pj = preview.querySelector('img');
+            const rect = preview.getBoundingClientRect();
+            let pw = rect.width || parseInt(getComputedStyle(pj).maxWidth) || 260;
+            let ph = rect.height || parseInt(getComputedStyle(pj).maxHeight) || 260;
+
+            let desiredX = ev.clientX + offsetX;
+            let desiredY = ev.clientY - offsetY - ph;
+
+            const margin = 8;
+            if (desiredX + pw > window.innerWidth - margin) {
+                desiredX = window.innerWidth - pw - margin;
+            }
+            if (desiredX < margin) desiredX = margin;
+
+            if (desiredY < margin) {
+                desiredY = ev.clientY + offsetY;
+                if (desiredY + ph > window.innerHeight - margin) {
+                    desiredY = window.innerHeight - ph - margin;
+                }
+            }
+
+            preview.style.left = Math.max(margin, Math.round(desiredX)) + 'px';
+            preview.style.top = Math.max(margin, Math.round(desiredY)) + 'px';
+        });
+
+        img.addEventListener('mouseleave', () => {
+            preview.style.display = 'none';
+            const pj = preview.querySelector('img');
+            pj.src = '';
+        });
+    });
+}
+
+function populateFilters() {
+    if (!typeSelect || !fastSelect) return;
+    const typeSet = new Set();
+    const fastSet = new Set();
+    groupsArray.forEach(g => {
+        g.variants.forEach(v => {
+            const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypes() : undefined) ?? v.type ?? v.types_list ?? [];
+            if (Array.isArray(types)) types.forEach(t => t && typeSet.add(t)); else if (types) typeSet.add(types);
+            (v.fast_attacks || []).forEach(a => { if (a && a.name) fastSet.add(a.name); });
+        });
+    });
+
+    function fillSelect(sel, items) {
+        sel.innerHTML = '';
+        const empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Tous'; sel.appendChild(empty);
+        Array.from(items).sort().forEach(it => { const o = document.createElement('option'); o.value = it; o.textContent = it; sel.appendChild(o); });
+    }
+    fillSelect(typeSelect, typeSet);
+    fillSelect(fastSelect, fastSet);
+}
+
+function matchesType(group, type) {
+    if (!type) return true;
+    return group.variants.some(v => {
+        const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypes() : undefined) ?? v.type ?? v.types_list ?? [];
+        if (Array.isArray(types)) return types.includes(type);
+        return (types || '') === type;
+    });
+}
+
+function matchesFast(group, fast) {
+    if (!fast) return true;
+    return group.variants.some(v => (v.fast_attacks || []).some(a => (a && a.name) === fast));
+}
+
+function applyFilters() {
+    const t = (typeSelect && typeSelect.value) ? typeSelect.value.trim() : '';
+    const f = (fastSelect && fastSelect.value) ? fastSelect.value.trim() : '';
+    const name = (nameInput && nameInput.value) ? nameInput.value.trim().toLowerCase() : '';
+    filteredGroups = groupsArray.filter(g => {
+        if (name) {
+            const n = String(g.name || '').toLowerCase();
+            if (!n.includes(name)) return false;
+        }
+        if (!matchesType(g, t)) return false;
+        if (!matchesFast(g, f)) return false;
+        return true;
+    });
+    totalPages = Math.max(1, Math.ceil(filteredGroups.length / pageSize));
+    renderPage(1);
+}
+
+function closeDetails() {
+    detailsOverlay.style.display = 'none';
+    const img = detailsOverlay.querySelector('.pokemon-details-image img');
+    if (img) img.src = '';
+    document.body.style.overflow = '';
+}
+
+function renderPage(page) {
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    currentPage = page;
+    const start = (page - 1) * pageSize;
+    const slice = filteredGroups.slice(start, start + pageSize);
+    const table = createPokemonTableFromGroups(slice);
+    container.innerHTML = '';
+    container.appendChild(table);
+    attachPreviewHandlers(table);
+    attachRowClickHandlers(table);
+    if (pageInfo) pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+}
+
 document.addEventListener('change', e => {
     if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'select') {
         const select = e.target;
@@ -148,81 +460,35 @@ document.addEventListener('DOMContentLoaded', () => {
     PokeFonctions.fill_Pokemons();
     const pokemons = Class.Pokemon.all_pokemons;
 
-    const groupsArray = buildGroupsFromPokemons(pokemons);
-    const pageSize = 25;
-    let currentPage = 1;
-    const totalPages = Math.max(1, Math.ceil(groupsArray.length / pageSize));
+    groupsArray = buildGroupsFromPokemons(pokemons);
+    filteredGroups = groupsArray.slice();
+    pageSize = 25;
+    currentPage = 1;
+    totalPages = Math.max(1, Math.ceil(filteredGroups.length / pageSize));
 
-    const container = document.getElementById('pokemon-container') || document.body;
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const pageInfo = document.getElementById('pageInfo');
+    container = document.getElementById('pokemon-container') || document.body;
+    prevBtn = document.getElementById('prevBtn');
+    nextBtn = document.getElementById('nextBtn');
+    pageInfo = document.getElementById('pageInfo');
+    const filterContainer = document.getElementById('filter-container');
+    typeSelect = document.getElementById('filterType');
+    fastSelect = document.getElementById('filterFast');
+    nameInput = document.getElementById('filterName');
 
-    const preview = document.createElement('div');
+    preview = document.createElement('div');
     preview.id = 'image-preview';
     preview.style.display = 'none';
     preview.innerHTML = '<img alt="" />';
     document.body.appendChild(preview);
 
-    function getLargeSrcFromSmall(src) {
-        try {
-            return src.replace('/thumbnails/', '/images/');
-        } catch (e) {
-            return src;
-        }
+    if (typeSelect && fastSelect && nameInput) {
+        populateFilters();
+        typeSelect.addEventListener('change', () => applyFilters());
+        fastSelect.addEventListener('change', () => applyFilters());
+        nameInput.addEventListener('input', () => applyFilters());
     }
 
-    function attachPreviewHandlers(root) {
-        const imgs = root.querySelectorAll('img');
-        imgs.forEach(img => {
-            if (img.__previewAttached) return;
-            img.__previewAttached = true;
-
-            img.addEventListener('mouseenter', (ev) => {
-                const largeSrc = getLargeSrcFromSmall(img.src || '');
-                const pj = preview.querySelector('img');
-                pj.src = largeSrc;
-                pj.alt = img.alt || '';
-                preview.style.display = 'block';
-            });
-
-            img.addEventListener('mousemove', (ev) => {
-                const offsetX = 12;
-                const offsetY = 18;
-                const pj = preview.querySelector('img');
-                const rect = preview.getBoundingClientRect();
-                let pw = rect.width || parseInt(getComputedStyle(pj).maxWidth) || 260;
-                let ph = rect.height || parseInt(getComputedStyle(pj).maxHeight) || 260;
-
-                let desiredX = ev.clientX + offsetX;
-                let desiredY = ev.clientY - offsetY - ph;
-
-                const margin = 8;
-                if (desiredX + pw > window.innerWidth - margin) {
-                    desiredX = window.innerWidth - pw - margin;
-                }
-                if (desiredX < margin) desiredX = margin;
-
-                if (desiredY < margin) {
-                    desiredY = ev.clientY + offsetY;
-                    if (desiredY + ph > window.innerHeight - margin) {
-                        desiredY = window.innerHeight - ph - margin;
-                    }
-                }
-
-                preview.style.left = Math.max(margin, Math.round(desiredX)) + 'px';
-                preview.style.top = Math.max(margin, Math.round(desiredY)) + 'px';
-            });
-
-            img.addEventListener('mouseleave', () => {
-                preview.style.display = 'none';
-                const pj = preview.querySelector('img');
-                pj.src = '';
-            });
-        });
-    }
-
-    const detailsOverlay = document.createElement('div');
+    detailsOverlay = document.createElement('div');
     detailsOverlay.id = 'pokemon-details-overlay';
     detailsOverlay.style.display = 'none';
     detailsOverlay.innerHTML = `
@@ -234,8 +500,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <header class="details-header">
                         <h2 class="pokemon-details-title"></h2>
                         <nav class="details-tabs" role="tablist">
-                            <button class="tab-button active" role="tab" data-tab="overview" aria-selected="true">Overview</button>
-                            <button class="tab-button" role="tab" data-tab="attacks" aria-selected="false">Attaques</button>
+                            <button class="btn tab-button active" role="tab" data-tab="overview" aria-selected="true">Overview</button>
+                            <button class="btn tab-button" role="tab" data-tab="attacks" aria-selected="false">Attaques</button>
                         </nav>
                     </header>
                     <section class="tab-panel" data-panel="overview">
@@ -253,20 +519,12 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.body.appendChild(detailsOverlay);
 
-    function closeDetails() {
-        detailsOverlay.style.display = 'none';
-        const img = detailsOverlay.querySelector('.pokemon-details-image img');
-        if (img) img.src = '';
-        document.body.style.overflow = '';
-    }
-
     detailsOverlay.addEventListener('click', (ev) => {
         if (ev.target === detailsOverlay) closeDetails();
     });
     detailsOverlay.querySelector('.pokemon-details-close').addEventListener('click', closeDetails);
     document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeDetails(); });
 
-    // Onglets: gestion simple (Event delegation)
     detailsOverlay.addEventListener('click', (ev) => {
         const btn = ev.target && ev.target.closest && ev.target.closest('.tab-button');
         if (!btn) return;
@@ -285,169 +543,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function showDetailsForRow(row) {
-        document.body.style.overflow = 'hidden';
-        console.debug('showDetailsForRow called for row', row && row.dataset && row.dataset.pokemonId);
-        const id = row.dataset.pokemonId;
-        const name = row.dataset.pokemonName || '';
-            const group = groupsArray.find(g => String(g.id) === String(id) && (g.name || '') === name);
-        if (!group) return;
-        const select = row.querySelector('select');
-        const idx = select ? Number(select.value || select.selectedIndex || 0) : 0;
-        const variant = group.variants[idx] || group.variants[0] || {};
-
-        const imgEl = detailsOverlay.querySelector('.pokemon-details-image img');
-        const titleEl = detailsOverlay.querySelector('.pokemon-details-title');
-        const statsEl = detailsOverlay.querySelector('.pokemon-details-stats');
-        const variantsEl = detailsOverlay.querySelector('.pokemon-details-variants');
-        const attacksContainer = detailsOverlay.querySelector('.pokemon-attacks-table');
-
-        // stocker l'identité affichée pour permettre des mises à jour externes
-        detailsOverlay.dataset.pokemonId = String(group.id);
-        detailsOverlay.dataset.pokemonName = group.name || '';
-
-        // forcer affichage de l'onglet overview par défaut
-        const tabButtons = detailsOverlay.querySelectorAll('.tab-button');
-        tabButtons.forEach(b => {
-            const isOverview = b.dataset.tab === 'overview';
-            b.classList.toggle('active', isOverview);
-            b.setAttribute('aria-selected', isOverview ? 'true' : 'false');
-        });
-        const panels = detailsOverlay.querySelectorAll('.tab-panel');
-        panels.forEach(p => {
-            if (p.dataset.panel === 'overview') p.removeAttribute('hidden'); else p.setAttribute('hidden', '');
-        });
-
-        const idNum = Number(group.id);
-        if (!Number.isNaN(idNum)) {
-            const padded = idNum < 10 ? '00' + idNum : idNum < 100 ? '0' + idNum : String(idNum);
-            imgEl.src = './imgs/webp/images/' + padded + '.webp';
-            imgEl.alt = group.name || '';
-        } else {
-            imgEl.src = '';
-            imgEl.alt = group.name || '';
-        }
-
-        titleEl.textContent = `${group.id} — ${group.name || ''}`;
-
-        const types = variant.types ?? (typeof variant.getTypes === 'function' ? variant.getTypes() : undefined) ?? variant.type ?? variant.types_list ?? [];
-        const stamina = variant.base_stamina ?? variant.stamina ?? variant.hp ?? '';
-        const attack = variant.base_attack ?? variant.attack ?? '';
-        const defense = variant.base_defense ?? variant.defense ?? '';
-
-        statsEl.innerHTML = `
-            <table class="details-stats">
-                <tr><th>Types</th><td>${Array.isArray(types) ? types.join(', ') : (types || '')}</td></tr>
-                <tr><th>Endurance</th><td>${stamina}</td></tr>
-                <tr><th>Attaque</th><td>${attack}</td></tr>
-                <tr><th>Défense</th><td>${defense}</td></tr>
-            </table>
-        `;
-
-        // Pour corriger l'affichage mobile (notre media query convertit les tables en blocks),
-        // ajouter l'attribut data-label sur chaque <td> avec le texte du <th> correspondant.
-        try {
-            const statRows = statsEl.querySelectorAll('tr');
-            statRows.forEach(r => {
-                const th = r.querySelector('th');
-                const td = r.querySelector('td');
-                if (th && td) {
-                    td.setAttribute('data-label', th.textContent || '');
-                }
-            });
-        } catch (e) {
-            // silent
-        }
-
-        // Afficher le tableau des attaques pour la variante sélectionnée
-        if (attacksContainer) {
-            attacksContainer.innerHTML = '';
-            const attacks = (typeof variant.getAttacks === 'function') ? variant.getAttacks() : [];
-            if (attacks && attacks.length > 0) {
-                const table = document.createElement('table');
-                table.className = 'details-attacks';
-                const thead = document.createElement('thead');
-                thead.innerHTML = '<tr><th>Nom</th><th>Type</th><th>Puissance</th><th>Durée (ms)</th><th>Énergie</th><th>Catégorie</th></tr>';
-                table.appendChild(thead);
-                const tbodyAtk = document.createElement('tbody');
-
-                const fastSet = new Set((variant.fast_attacks || []).map(a => a && a.name));
-                const chargedSet = new Set((variant.charged_attacks || []).map(a => a && a.name));
-
-                attacks.forEach(a => {
-                    if (!a) return;
-                    const tr = document.createElement('tr');
-                    const nameTd = document.createElement('td'); nameTd.textContent = a.name || '';
-                    const typeTd = document.createElement('td'); typeTd.textContent = a.type || '';
-                    const powerTd = document.createElement('td'); powerTd.textContent = a.power ?? '';
-                    const durTd = document.createElement('td'); durTd.textContent = a.duration ?? '';
-                    const engTd = document.createElement('td'); engTd.textContent = a.energy_delta ?? '';
-                    const catTd = document.createElement('td');
-                    const isFast = fastSet.has(a.name);
-                    const isCharged = chargedSet.has(a.name);
-                    catTd.textContent = isCharged && !isFast ? 'Chargée' : (isFast && !isCharged ? 'Rapide' : (isFast && isCharged ? 'Les deux' : ''));
-
-                    tr.appendChild(nameTd);
-                    tr.appendChild(typeTd);
-                    tr.appendChild(powerTd);
-                    tr.appendChild(durTd);
-                    tr.appendChild(engTd);
-                    tr.appendChild(catTd);
-                    tbodyAtk.appendChild(tr);
-                });
-
-                table.appendChild(tbodyAtk);
-                attacksContainer.appendChild(table);
-            } else {
-                attacksContainer.textContent = 'Aucune attaque renseignée.';
-            }
-        }
-
-        // variantes disponibles
-        variantsEl.innerHTML = '';
-        if (group.variants && group.variants.length > 1) {
-            const ul = document.createElement('ul');
-            ul.className = 'details-variants-list';
-            group.variants.forEach((v, i) => {
-                const li = document.createElement('li');
-                const label = v.form ?? v.forme ?? v.generation ?? v.variant ?? ('Variant ' + i);
-                li.textContent = label;
-                if (i === idx) li.classList.add('active');
-                li.addEventListener('click', () => {
-                    // simuler changement de select dans la table pour garder la cohérence
-                    const targetSelect = row.querySelector('select');
-                    if (targetSelect) {
-                        targetSelect.selectedIndex = i;
-                        const ev = new Event('change');
-                        targetSelect.dispatchEvent(ev);
-                    }
-                    showDetailsForRow(row);
-                });
-                ul.appendChild(li);
-            });
-            variantsEl.appendChild(ul);
-        }
-
-        detailsOverlay.style.display = 'flex';
-    }
-
-    function attachRowClickHandlers(root) {
-        const rows = root.querySelectorAll('tbody tr');
-        console.debug('attachRowClickHandlers found rows:', rows.length);
-        rows.forEach(r => {
-            if (r.__detailsAttached) return;
-            r.__detailsAttached = true;
-            r.addEventListener('click', (ev) => {
-                console.debug('row click', { id: r.dataset.pokemonId, target: ev.target && ev.target.tagName });
-                // ignorer si on clique sur le select lui-même ou l'image (prévisualisation gérée séparément)
-                if (ev.target && (ev.target.tagName === 'SELECT' || ev.target.tagName === 'OPTION' || ev.target.tagName === 'IMG')) return;
-                showDetailsForRow(r);
-            });
-            r.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); showDetailsForRow(r); } });
-        });
-    }
-
-    // Met à jour l'overlay de détails si la variante d'une ligne affichée change
     document.addEventListener('pokemonVariantChanged', (ev) => {
         const row = ev && ev.detail && ev.detail.row;
         if (!row) return;
@@ -459,27 +554,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function renderPage(page) {
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        currentPage = page;
-        const start = (page - 1) * pageSize;
-        const slice = groupsArray.slice(start, start + pageSize);
-        const table = createPokemonTableFromGroups(slice);
-        container.innerHTML = '';
-        container.appendChild(table);
-        attachPreviewHandlers(table);
-        attachRowClickHandlers(table);
-        if (pageInfo) pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
-        if (prevBtn) prevBtn.disabled = currentPage <= 1;
-        if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
-    }
-
     if (prevBtn) prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
     if (nextBtn) nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
 
     renderPage(1);
-
-
 }); 
 

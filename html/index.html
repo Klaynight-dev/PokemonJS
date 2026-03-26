@@ -7,19 +7,27 @@
 	<link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-	<h1>PokemonJS</h1>
+	<main>
+		<h1>PokemonJS</h1>
 
-	<div class="controls">
-		<a class="btn" href="test/test.html">Aller à la page de test</a>
-	</div>
+		<div class="controls">
+			<a class="btn" href="test/test.html">Aller à la page de test</a>
+		</div>
 
-	<nav class="pagination">
-		<button id="prevBtn" class="btn">PRÉC</button>
-		<span id="pageInfo">Page 1 / 1</span>
-		<button id="nextBtn" class="btn">SUIV</button>
-	</nav>
+		<nav class="pagination">
+			<button id="prevBtn" class="btn">PRÉC</button>
+			<span id="pageInfo">Page 1 / 1</span>
+			<button id="nextBtn" class="btn">SUIV</button>
+		</nav>
 
-	<div id="pokemon-container"></div>
+		<div id="filter-container" class="filters" aria-label="Filtrage des Pokémons">
+			<label class="btn">Type: <select id="filterType"><option value="">Tous</option></select></label>
+			<label class="btn">Attaque rapide: <select id="filterFast"><option value="">Tous</option></select></label>
+			<label class="btn">Nom: <input type="search" id="filterName" placeholder="Filtrer par nom"></label>
+		</div>
+
+		<div id="pokemon-container"></div>
+	</main>
 
 	<script type="module" src="js/script.js"></script>
 </body>

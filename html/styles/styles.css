@@ -26,6 +26,36 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.filters {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0.75rem 0 1rem 0;
+}
+.filters select, .filters input[type=search] {
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #3a3f47;
+  background: #1f2328;
+  color: #e6eef8;
+  font-weight: 600;
+  min-width: 160px;
+}
+.filters input[type=search] {
+  min-width: 220px;
+}
+@media (max-width: 600px) {
+  .filters label {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+  .filters select, .filters input[type=search] {
+    min-width: 0;
+    width: 60%;
+  }
+}
+
 textarea {
   background: #1e1e1e;
   color: #d4d4d4;
@@ -99,18 +129,8 @@ table td img {
   cursor: default;
 }
 table select {
-  padding: 0.4rem 0.75rem;
-  border-radius: 5em;
-  border: 2px solid #444;
-  background: #23272e;
-  color: #e0e0e0;
   font-size: 1rem;
   font-weight: 600;
-  transition: border-color 0.15s, background 0.15s;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  outline: none;
   cursor: default;
   width: 100%;
 }
@@ -120,19 +140,22 @@ table select:focus {
 }
 
 .btn {
-  display: inline-block;
-  padding: 0.45rem 0.75rem;
-  text-decoration: none;
+  padding: 0.4rem 0.75rem;
   border-radius: 5em;
-  background: #4d4d4d;
-  color: white;
-  font-weight: 600;
-  border: 3px solid rgb(152, 152, 152);
-  transition: background 0.15s ease;
+  border: 2px solid #444;
+  background: #23272e;
+  color: #e0e0e0;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
   cursor: pointer;
+  text-decoration: none;
 }
 .btn:hover {
-  background: #404040;
+  border-color: #6c9edb;
+  background: #2d323b;
 }
 
 .btn-not-allowed {
@@ -207,7 +230,6 @@ table select:focus {
     cursor: default;
   }
 }
-/* Override: keep attacks table layout (scrollable) on small screens instead of stacking */
 @media (max-width: 794px) {
   .pokemon-attacks-table {
     overflow-x: auto;
@@ -317,20 +339,12 @@ table select:focus {
   flex-wrap: wrap;
 }
 
-.details-variants-list li {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 6px 10px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.details-variants-list li.active {
+.active {
   background: rgba(108, 158, 219, 0.18);
   border: 1px solid rgba(108, 158, 219, 0.25);
   color: #dfefff;
 }
 
-/* Tabs for details overlay */
 .details-header {
   display: flex;
   align-items: center;
@@ -344,27 +358,10 @@ table select:focus {
   margin-left: 12px;
 }
 
-.tab-button {
-  background: rgba(255, 255, 255, 0.03);
-  color: #dde6ef;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.tab-button.active {
-  background: linear-gradient(180deg, rgba(108, 158, 219, 0.16), rgba(108, 158, 219, 0.06));
-  border-color: rgba(108, 158, 219, 0.28);
-  color: #eaf6ff;
-}
-
 .tab-panel {
   margin-top: 14px;
 }
 
-/* attacks table inside details */
 .pokemon-attacks-table table {
   width: 100%;
   border-collapse: collapse;
@@ -395,7 +392,10 @@ table select:focus {
     max-height: 50vh;
   }
 }
-/* Mobile (small phones) tweaks */
+.pokemon-attacks-table td:before {
+  display: none !important;
+}
+
 @media (max-width: 480px) {
   #pokemon-details-overlay {
     padding: 8px;
@@ -446,7 +446,6 @@ table select:focus {
   .pokemon-details-stats, .pokemon-details-variants, .pokemon-details-attacks {
     width: 100%;
   }
-  /* Make attacks table horizontally scrollable on very small screens */
   .pokemon-attacks-table {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -454,7 +453,6 @@ table select:focus {
   .pokemon-attacks-table table {
     min-width: 520px;
   }
-  /* Reduce paddings for table rows */
   .pokemon-attacks-table th, .pokemon-attacks-table td {
     padding: 8px 8px;
     font-size: 13px;
