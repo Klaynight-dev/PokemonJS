@@ -114,9 +114,9 @@ function sortPokemonsByTypeThenName() {
         }
         return typeA.localeCompare(typeB);
     });
-    console.log("Pokémons triés par type puis par nom :");
+    console.log("Liste de tous les pokémons (" + sortedPokemons.length + ") triés par type puis par nom :");
     for (const pokemon of sortedPokemons) {
-        console.log("- " + pokemon.name);
+        console.log(pokemon.toString());
     }
 }
 
@@ -125,8 +125,8 @@ function sortPokemonsByTypeThenName() {
  * @param {string} attackName - Le nom de l'attaque pour laquelle trouver les faiblesses.
  * @returns {void}
  */
-function getWeaknessesEnemies(attackName) {
-    const pokemon = Class.Pokemon.all_pokemons.find(p => p.getAttacks().some(a => a.name === attackName));
+function getWeakestEnemies(attackName) {
+    const pokemon = Class.Pokemon.all_pokemons.find(p => p.getAttacks().some(a => a.name.toLowerCase() === attackName.toLowerCase()));
     if (!pokemon) {
         console.log("Aucun Pokémon ne peut apprendre l'attaque " + attackName);
         return;
@@ -346,7 +346,7 @@ console.log(getPokemonsByType());
 // getPokemonsByAttack("Flamethrower");
 // getAttacksByType("Fire");
 // sortPokemonsByTypeThenName();
-// getWeaknessesEnemies("Flamethrower");
+// getWeakestEnemies("Flamethrower");
 // getBestFastAttackForEnemy(true, "Bulbasaur");
 // fastFight("Bulbasaur", "Charmander");
 
@@ -356,7 +356,7 @@ export {
   getPokemonsByAttack,
   getAttacksByType,
   sortPokemonsByTypeThenName,
-  getWeaknessesEnemies,
+  getWeakestEnemies,
   getBestFastAttackForEnemy,
   fastFight,
   fill_Pokemons

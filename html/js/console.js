@@ -95,6 +95,7 @@ const actions = {
   getAttacksByType: (arg) => Tests.getAttacksByType(arg),
   getPokemonsByType: (arg) => Tests.getPokemonsByType(arg),
   getPokemonsByAttack: (arg) => Tests.getPokemonsByAttack(arg),
+  sortPokemonsByTypeThenName: () => Tests.sortPokemonsByTypeThenName(),
   clear: () => clearConsole()
 };
 
