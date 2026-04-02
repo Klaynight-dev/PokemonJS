@@ -1,7 +1,11 @@
 import * as Class from '../test/import.test.js';
 import * as PokeFonctions from '../test/test.js';
 
-// Variables partagées utilisées par les fonctions définies en haut du fichier
+/** Variables partagées utilisées par les fonctions :
+ * Fonction de tri : currentSortKey, currentSortDir
+ * Pagination : groupsArray, filteredGroups, pageSize, currentPage, totalPages
+ * Références DOM : container, prevBtn, nextBtn, pageInfo, typeSelect, fastSelect, nameInput, preview, detailsOverlay
+ */
 let groupsArray = [];
 let filteredGroups = [];
 let pageSize = 25;
@@ -16,6 +20,67 @@ let fastSelect = null;
 let nameInput = null;
 let preview = null;
 let detailsOverlay = null;
+let currentSortKey = null;
+let currentSortDir = 1; // 1 = croissant, -1 = décroissant
+
+/**
+ * Récupère la variante principale d'un groupe de variantes, en privilégiant la forme "Normal" si elle existe.
+ * @param {Object} group - Un groupe de variantes, contenant un tableau de variantes dans la propriété "variants".
+ * @returns {Object} - La variante principale du groupe, ou une variante par défaut si aucune n'est trouvée.
+ */
+function getPrimaryVariant(group) {
+    const normalIdx = group.variants.findIndex(v => (v.form ?? v.forme ?? '').toLowerCase() === 'normal');
+    const idx = normalIdx >= 0 ? normalIdx : 0;
+    return group.variants[idx] || group.variants[0] || {};
+}
+
+/**
+ * Récupère la valeur de tri d'un groupe de variantes en fonction de la clé de tri spécifiée.
+ * La fonction tente d'extraire la valeur de tri à partir de la variante principale du groupe, en utilisant différentes propriétés selon la clé.
+ * @param {Object} group - Groupe de variantes à partir duquel extraire la valeur de tri.
+ * @param {string} key - La clé de tri, qui peut être [ID, Nom, Génération, Types, "Endurance, Attaque, Défense].
+ * @returns {number|string} - La valeur de tri extraite du groupe, ou une valeur par défaut si elle ne peut pas être déterminée.
+ */
+function getSortValue(group, key) {
+    const v = getPrimaryVariant(group);
+    switch (key) {
+        case 'ID': return Number(group.id) || 0;
+        case 'Nom': return String(group.name || '').toLowerCase();
+        case 'Génération': return String(v.form ?? v.forme ?? v.generation ?? v.variant ?? '').toLowerCase();
+        case 'Types': {
+            const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypes() : undefined) ?? v.type ?? v.types_list ?? [];
+            return Array.isArray(types) ? types.join(', ').toLowerCase() : String(types || '').toLowerCase();
+        }
+        case 'Endurance': return Number(v.base_stamina ?? v.stamina ?? v.hp) || 0;
+        case 'Attaque': return Number(v.base_attack ?? v.attack) || 0;
+        case 'Défense': return Number(v.base_defense ?? v.defense) || 0;
+        default: return '';
+    }
+}
+
+
+/**
+ * Bascule l'ordre de tri pour une colonne donnée.
+ * @param {string} key - La clé de tri pour laquelle basculer l'ordre.
+ */
+function toggleSort(key) {
+    if (currentSortKey === key) currentSortDir = -currentSortDir;
+    else { currentSortKey = key; currentSortDir = 1; }
+    if (Array.isArray(filteredGroups)) {
+        filteredGroups.sort((a, b) => {
+            const va = getSortValue(a, currentSortKey);
+            const vb = getSortValue(b, currentSortKey);
+            if (va === vb) return 0;
+            if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * currentSortDir;
+            const sa = String(va).toLowerCase();
+            const sb = String(vb).toLowerCase();
+            if (sa < sb) return -1 * currentSortDir;
+            if (sa > sb) return 1 * currentSortDir;
+            return 0;
+        });
+    }
+    renderPage(1);
+}
 
 /**
  * Construit des groupes de variantes à partir d'un tableau de Pokémon.
@@ -36,6 +101,12 @@ function buildGroupsFromPokemons(pokemons) {
     return Array.from(groups.values());
 }
 
+/**
+ * Crée une <table> à partir d'un tableau de groupes de variantes.
+ * Chaque groupe correspond à une ligne de la table, avec des colonnes pour l'ID, le nom, la génération, les types, les statistiques et l'image.
+ * @param {*} groups 
+ * @returns 
+ */
 function createPokemonTableFromGroups(groups) {
     const table = document.createElement('table');
     table.className = 'pokemon-table';
@@ -48,6 +119,16 @@ function createPokemonTableFromGroups(groups) {
     headers.forEach(text => {
         const th = document.createElement('th');
         th.textContent = text;
+        th.dataset.key = text;
+        if (text !== 'Image') {
+            th.style.cursor = 'pointer';
+            th.tabIndex = 0;
+            th.addEventListener('click', () => toggleSort(text));
+            th.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSort(text); }});
+        }
+        if (currentSortKey === text) {
+            th.classList.add('sorted', currentSortDir === 1 ? 'asc' : 'desc');
+        }
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -105,6 +186,10 @@ function createPokemonTableFromGroups(groups) {
         tdImage.appendChild(img);
         row.appendChild(tdImage);
 
+        /**
+         * Applique les propriétés d'une variante donnée aux éléments de la ligne.
+         * @param {*} variant - La variante à appliquer.
+         */
         function applyVariant(variant) {
             const types = variant.types ?? (typeof variant.getTypes === 'function' ? variant.getTypes() : undefined) ?? variant.type ?? variant.types_list ?? [];
             tdTypes.textContent = Array.isArray(types) ? types.join(', ') : (types || '');
@@ -148,6 +233,11 @@ function createPokemonTableFromGroups(groups) {
     return table;
 }
 
+/**
+ * Affiche les détails pour une ligne donnée.
+ * @param {HTMLElement} row - La ligne pour laquelle afficher les détails.
+ * @returns {void}
+ */
 function showDetailsForRow(row) {
     document.body.style.overflow = 'hidden';
     const id = row.dataset.pokemonId;
@@ -297,6 +387,10 @@ function showDetailsForRow(row) {
     detailsOverlay.style.display = 'flex';
 }
 
+/**
+ * Attache les gestionnaires d'événements pour les clics sur les lignes de la table.
+ * @param {HTMLElement} root - Le conteneur racine contenant les lignes.
+ */
 function attachRowClickHandlers(root) {
     const rows = root.querySelectorAll('tbody tr');
     rows.forEach(r => {
@@ -310,6 +404,11 @@ function attachRowClickHandlers(root) {
     });
 }
 
+/**
+ * Récupère la source de l'image en taille grande à partir de la source en taille réduite.
+ * @param {string} src - La source de l'image en taille réduite.
+ * @returns {string} - La source de l'image en taille grande.
+ */
 function getLargeSrcFromSmall(src) {
     try {
         return src.replace('/thumbnails/', '/images/');
@@ -318,6 +417,10 @@ function getLargeSrcFromSmall(src) {
     }
 }
 
+/**
+ * Attache les gestionnaires d'événements pour les aperçus d'images.
+ * @param {HTMLElement} root - Le conteneur racine contenant les images.
+ */
 function attachPreviewHandlers(root) {
     const imgs = root.querySelectorAll('img');
     imgs.forEach(img => {
@@ -368,6 +471,10 @@ function attachPreviewHandlers(root) {
     });
 }
 
+/**
+ * Remplit les sélecteurs de filtres avec les options disponibles.
+ * @returns {void}
+ */
 function populateFilters() {
     if (!typeSelect || !fastSelect) return;
     const typeSet = new Set();
@@ -380,6 +487,11 @@ function populateFilters() {
         });
     });
 
+    /**
+     * Remplit un sélecteur avec les options données.
+     * @param {HTMLElement} sel - Le sélecteur à remplir.
+     * @param {Set} items - L'ensemble des options à ajouter.
+     */
     function fillSelect(sel, items) {
         sel.innerHTML = '';
         const empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Tous'; sel.appendChild(empty);
@@ -389,6 +501,12 @@ function populateFilters() {
     fillSelect(fastSelect, fastSet);
 }
 
+/**
+ * Vérifie si un groupe correspond à un type donné.
+ * @param {Object} group - Le groupe à vérifier.
+ * @param {string} type - Le type à rechercher.
+ * @returns {boolean} - true si le groupe correspond au type, false sinon.
+ */
 function matchesType(group, type) {
     if (!type) return true;
     return group.variants.some(v => {
@@ -398,11 +516,20 @@ function matchesType(group, type) {
     });
 }
 
+/**
+ * Vérifie si un groupe correspond à une attaque rapide donnée.
+ * @param {Object} group - Le groupe à vérifier.
+ * @param {string} fast - L'attaque rapide à rechercher.
+ * @returns {boolean} - true si le groupe correspond à l'attaque rapide, false sinon.
+ */
 function matchesFast(group, fast) {
     if (!fast) return true;
     return group.variants.some(v => (v.fast_attacks || []).some(a => (a && a.name) === fast));
 }
 
+/**
+ * Applique les filtres sélectionnés et met à jour l'affichage en conséquence.
+ */
 function applyFilters() {
     const t = (typeSelect && typeSelect.value) ? typeSelect.value.trim() : '';
     const f = (fastSelect && fastSelect.value) ? fastSelect.value.trim() : '';
@@ -416,10 +543,26 @@ function applyFilters() {
         if (!matchesFast(g, f)) return false;
         return true;
     });
+    if (currentSortKey) {
+        filteredGroups.sort((a, b) => {
+            const va = getSortValue(a, currentSortKey);
+            const vb = getSortValue(b, currentSortKey);
+            if (va === vb) return 0;
+            if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * currentSortDir;
+            const sa = String(va).toLowerCase();
+            const sb = String(vb).toLowerCase();
+            if (sa < sb) return -1 * currentSortDir;
+            if (sa > sb) return 1 * currentSortDir;
+            return 0;
+        });
+    }
     totalPages = Math.max(1, Math.ceil(filteredGroups.length / pageSize));
     renderPage(1);
 }
 
+/**
+ * Ferme la fenêtre de détails et réinitialise son contenu.
+ */
 function closeDetails() {
     detailsOverlay.style.display = 'none';
     const img = detailsOverlay.querySelector('.pokemon-details-image img');
@@ -427,6 +570,10 @@ function closeDetails() {
     document.body.style.overflow = '';
 }
 
+/**
+ * Affiche les éléments d'une page donnée.
+ * @param {number} page - Le numéro de la page à afficher.
+ */
 function renderPage(page) {
     if (page < 1) page = 1;
     if (page > totalPages) page = totalPages;

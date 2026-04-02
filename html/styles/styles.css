@@ -105,9 +105,22 @@ table th, table td {
 }
 table th {
   background: #2d323b;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.03em;
   border-bottom: 2px solid #3a3f47;
+}
+table th.sorted {
+  font-weight: 700;
+}
+table th.sorted.asc::after {
+  content: ' ▲';
+  font-size: 0.85em;
+  margin-left: 6px;
+}
+table th.sorted.desc::after {
+  content: ' ▼';
+  font-size: 0.85em;
+  margin-left: 6px;
 }
 table tr {
   transition: background 0.15s;
