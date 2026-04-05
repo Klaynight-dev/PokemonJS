@@ -158,7 +158,7 @@ function getWeakestEnemies(attackName) {
  * @param {String} pokemonName
  * @return {Object} Un objet contenant l'attaque rapide la plus efficace, les points de dégâts par seconde (DPS) et le multiplicateur d'efficacité contre le Pokémon ennemi. 
  */
-function getBestFastAttackForEnemy(print, pokemonName) {
+function getBestFastAttacksForEnemy(print, pokemonName) {
     const pokemon = Class.Pokemon.all_pokemons.find(p => p.name === pokemonName);
     if (!pokemon) {
         if (print) {
@@ -168,7 +168,7 @@ function getBestFastAttackForEnemy(print, pokemonName) {
     }
 
     const fastMoveIds = new Set(Class.fast_moves.map(m => m.move_id));
-    const fastMoves = Class.Attack.all_attacks.filter(a => fastMoveIds.has(a.id));
+    const fastMoves = Class.Attack.all_attacks.filter(a => fastMoveIds.has(a.id)).sort();
     if (fastMoves.length === 0) {
         if (print) {
             console.table("Aucune attaque rapide disponible.");
@@ -243,7 +243,7 @@ function fastFight(pokemonNameA, pokemonNameB) {
     let defenderHp = hpB;
 
     while (turn <= 100 && attackerHp > 0 && defenderHp > 0) {
-        const bestAttack = getBestFastAttackForEnemy(false, defender.name);
+        const bestAttack = getBestFastAttacksForEnemy(false, defender.name);
         if (!bestAttack || !bestAttack.atk) {
             console.table("Impossible de déterminer l'attaque rapide pour le combat.");
             break;
@@ -333,7 +333,8 @@ function fill_Pokemons() {
 
 fill_Pokemons();
 
-console.table(getPokemonsByType());
+getBestFastAttacksForEnemy(true, "Charizard");
+// console.table(getPokemonsByType());
 // console.table(Class.Pokemon.all_pokemons[0].getAttacks());
 // console.table(Class.Pokemon.all_pokemons[0].charged_attacks);
 // console.table(Class.Pokemon.all_pokemons[0].fast_attacks);
@@ -351,7 +352,7 @@ console.table(getPokemonsByType());
 // getAttacksByType("Fire");
 // sortPokemonsByTypeThenName();
 // getWeakestEnemies("Flamethrower");
-// getBestFastAttackForEnemy(true, "Bulbasaur");
+// getBestFastAttacksForEnemy(true, "Bulbasaur");
 // fastFight("Bulbasaur", "Charmander");
 
 export {
@@ -361,7 +362,7 @@ export {
   getAttacksByType,
   sortPokemonsByTypeThenName,
   getWeakestEnemies,
-  getBestFastAttackForEnemy,
+  getBestFastAttacksForEnemy,
   fastFight,
   fill_Pokemons
 };
