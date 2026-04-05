@@ -24,7 +24,7 @@ function testPokemonToString() {
     let index=0;
     for (const attack of Class.Attack.all_attacks) {
         index++;
-        console.log(attack.toString() + (attack.isCriticalAttack ? " (Critical Attack)" : "")
+        console.table(attack.toString() + (attack.isCriticalAttack ? " (Critical Attack)" : "")
         + " du " + index + "e Pokemon(s)");
     }
 }
@@ -45,9 +45,9 @@ function getPokemonsByType(typeName) {
             }
         }
     }
-    console.log("Liste des " + toPrint.length + " Pokémons de type " + typeName + " :");
+    console.table("Liste des " + toPrint.length + " Pokémons de type " + typeName + " :");
     toPrint.forEach(pokemon => {
-        console.log(pokemon);
+        console.table(pokemon);
     });
 }
 
@@ -59,11 +59,11 @@ function getPokemonsByType(typeName) {
 function getPokemonsByAttack(attackName) {
     const temp = [];
     let toPrint = [];
-    console.log("Pokémons pouvant apprendre l'attaque " + attackName + " :");
+    console.table("Pokémons pouvant apprendre l'attaque " + attackName + " :");
     const learners = Class.Pokemon.all_pokemons.filter(p => p.getAttacks().some(a => a.name?.toLowerCase() === attackName?.toLowerCase()));
 
     if (learners.length === 0) {
-        console.log("Aucun Pokémon ne peut apprendre l'attaque " + attackName);
+        console.table("Aucun Pokémon ne peut apprendre l'attaque " + attackName);
         return;
     }
 
@@ -73,9 +73,9 @@ function getPokemonsByAttack(attackName) {
             toPrint.push(pokemon.toString());
         }
     }
-    console.log("Liste des " + toPrint.length + " Pokémons pouvant apprendre l'attaque " + attackName + " :");
+    console.table("Liste des " + toPrint.length + " Pokémons pouvant apprendre l'attaque " + attackName + " :");
     toPrint.forEach(pokemon => {
-        console.log(pokemon);
+        console.table(pokemon);
     });
 }
 
@@ -88,21 +88,21 @@ function getAttacksByType(typeName) {
     let toPrint = [];
     const matches = Class.Attack.all_attacks.filter(attack => attack.type.toLowerCase === typeName.toLowerCase);
     if (matches.length === 0) {
-        console.log("Aucune attaque de type " + typeName);
+        console.table("Aucune attaque de type " + typeName);
         return;
     }
     for (const attack of matches) {
         toPrint.push(attack.toString());
     }
-    console.log("Liste des " + toPrint.length + " attaques de type " + typeName + " :");
+    console.table("Liste des " + toPrint.length + " attaques de type " + typeName + " :");
     toPrint.forEach(attack => {
-        console.log(attack);
+        console.table(attack);
     });
 }
 
 /**
  * Affiche les Pokémons triés par type puis par nom.
- * Les Pokémons sans type sont affichés en premier, suivis des Pokémons triés par ordre alphabétique de leur type, puis par ordre alphabétique de leur nom.
+ * Les Pokémons sans type sont affichés en premier, suivis des Pokémons triés par ordre alphabétique de leur type (si un Pokémon a plusieurs types, ceux-ci sont renvoyés dans un tableau trié par ordre alphabétique, si les deux Pokémons ont chacun deux types ont compare alors ces seconds types), puis par ordre alphabétique de leur nom.
  * @returns {void}
  */
 function sortPokemonsByTypeThenName() {
@@ -110,13 +110,16 @@ function sortPokemonsByTypeThenName() {
         const typeA = a.getTypes()[0] || "";
         const typeB = b.getTypes()[0] || "";
         if (typeA === typeB) {
+            if (a.getTypes().length == b.getTypes().length == 2){
+                return a.getTypes()[1].localeCompare(b.getTypes()[1]);
+            }
             return a.name.localeCompare(b.name);
         }
         return typeA.localeCompare(typeB);
     });
-    console.log("Liste de tous les pokémons (" + sortedPokemons.length + ") triés par type puis par nom :");
+    console.table("Liste de tous les pokémons (" + sortedPokemons.length + ") triés par type puis par nom :");
     for (const pokemon of sortedPokemons) {
-        console.log(pokemon.toString());
+        console.table(pokemon.toString());
     }
 }
 
@@ -128,24 +131,25 @@ function sortPokemonsByTypeThenName() {
 function getWeakestEnemies(attackName) {
     const pokemon = Class.Pokemon.all_pokemons.find(p => p.getAttacks().some(a => a.name.toLowerCase() === attackName.toLowerCase()));
     if (!pokemon) {
-        console.log("Aucun Pokémon ne peut apprendre l'attaque " + attackName);
+        console.table("Aucun Pokémon ne peut apprendre l'attaque " + attackName);
         return;
     }
-    const weaknesses = [];
+    const weakTypes = [];
     for (const type of pokemon.getTypes()) {
         const effectiveness = Class.type_effectiveness[type];
         if (effectiveness) {
             for (const [enemyType, multiplier] of Object.entries(effectiveness)) {
-                if (multiplier > 1 && !weaknesses.includes(enemyType)) {
-                    weaknesses.push(enemyType);
+                if (multiplier > 1) {
+                    weakTypes.push(enemyType.toLowerCase());
                 }
             }
         }
     }
-    console.log("Types vulnérables à l'attaque " + attackName + " :");
-    for (const weakness of weaknesses) {
-        console.log("- " + weakness);
-    }
+    const weakPokemons = Class.Pokemon.all_pokemons.filter(p => p.getTypes().some(a => weakTypes.includes(a.toLowerCase())));
+    console.table("Liste des " + weakPokemons.length + " pokémons faibles face à l'attaque " + attackName + " (ceux ayant les types " + weakTypes + ") :");
+    weakPokemons.forEach(weakToString => {
+        console.table(weakToString.toString());
+    });
 }
 
 /**
@@ -158,7 +162,7 @@ function getBestFastAttackForEnemy(print, pokemonName) {
     const pokemon = Class.Pokemon.all_pokemons.find(p => p.name === pokemonName);
     if (!pokemon) {
         if (print) {
-            console.log("Aucun Pokémon trouvé avec le nom " + pokemonName);
+            console.table("Aucun Pokémon trouvé avec le nom " + pokemonName);
         }
         return;
     }
@@ -167,7 +171,7 @@ function getBestFastAttackForEnemy(print, pokemonName) {
     const fastMoves = Class.Attack.all_attacks.filter(a => fastMoveIds.has(a.id));
     if (fastMoves.length === 0) {
         if (print) {
-            console.log("Aucune attaque rapide disponible.");
+            console.table("Aucune attaque rapide disponible.");
         }
         return;
     }
@@ -190,14 +194,14 @@ function getBestFastAttackForEnemy(print, pokemonName) {
 
     if (!best) {
         if (print) {
-            console.log("Impossible de déterminer la meilleure attaque rapide.");
+            console.table("Impossible de déterminer la meilleure attaque rapide.");
         }
         return;
     }
 
     if (print) {
-        console.log(`Meilleure attaque rapide contre ${pokemonName} : ${best.attack.name} (${best.attack.type})`);
-        console.log(`  Puissance: ${best.attack.power}, Multiplicateur: ${best.multiplier.toFixed(2)}, DPS: ${best.dps.toFixed(2)}`);
+        console.table(`Meilleure attaque rapide contre ${pokemonName} : ${best.attack.name} (${best.attack.type})`);
+        console.table(`  Puissance: ${best.attack.power}, Multiplicateur: ${best.multiplier.toFixed(2)}, DPS: ${best.dps.toFixed(2)}`);
     }
 
     return { atk: best.attack, pts: best.dps, eff: best.multiplier };
@@ -216,7 +220,7 @@ function fastFight(pokemonNameA, pokemonNameB) {
     const pokemonB = Class.Pokemon.all_pokemons.find(p => p.name === pokemonNameB);
 
     if (!pokemonA || !pokemonB) {
-        console.log(`Pokémon introuvable : ${!pokemonA ? pokemonNameA : pokemonNameB}`);
+        console.table(`Pokémon introuvable : ${!pokemonA ? pokemonNameA : pokemonNameB}`);
         return;
     }
 
@@ -241,7 +245,7 @@ function fastFight(pokemonNameA, pokemonNameB) {
     while (turn <= 100 && attackerHp > 0 && defenderHp > 0) {
         const bestAttack = getBestFastAttackForEnemy(false, defender.name);
         if (!bestAttack || !bestAttack.atk) {
-            console.log("Impossible de déterminer l'attaque rapide pour le combat.");
+            console.table("Impossible de déterminer l'attaque rapide pour le combat.");
             break;
         }
 
@@ -329,17 +333,17 @@ function fill_Pokemons() {
 
 fill_Pokemons();
 
-console.log(getPokemonsByType());
-// console.log(Class.Pokemon.all_pokemons[0].getAttacks());
-// console.log(Class.Pokemon.all_pokemons[0].charged_attacks);
-// console.log(Class.Pokemon.all_pokemons[0].fast_attacks);
+console.table(getPokemonsByType());
+// console.table(Class.Pokemon.all_pokemons[0].getAttacks());
+// console.table(Class.Pokemon.all_pokemons[0].charged_attacks);
+// console.table(Class.Pokemon.all_pokemons[0].fast_attacks);
 
 
 // Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
 // fill_Pokemons();
 
 // const attack1 = Class.Attack.all_attacks[0];
-// console.log(attack1.toString());
+// console.table(attack1.toString());
 
 // testPokemonToString();
 // getPokemonsByType("Fire");
