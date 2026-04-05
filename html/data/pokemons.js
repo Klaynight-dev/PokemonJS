@@ -56,7 +56,7 @@ export const pokemons =
             "base_stamina": 118,
             "form": "Fall_2019",
             "pokemon_id": 4,
-            "pokemon_name": "Charmander"
+            "pokemon_name": "Charizard"
         },
         {
             "base_attack": 116,
@@ -64,7 +64,7 @@ export const pokemons =
             "base_stamina": 118,
             "form": "Normal",
             "pokemon_id": 4,
-            "pokemon_name": "Charmander"
+            "pokemon_name": "Charizard"
         },
         {
             "base_attack": 158,

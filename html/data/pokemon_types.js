@@ -56,7 +56,7 @@ export const pokemon_types =
         {
             "form": "Fall_2019",
             "pokemon_id": 4,
-            "pokemon_name": "Charmander",
+            "pokemon_name": "Charizard",
             "type": [
                 "Fire"
             ]
@@ -64,7 +64,7 @@ export const pokemon_types =
         {
             "form": "Normal",
             "pokemon_id": 4,
-            "pokemon_name": "Charmander",
+            "pokemon_name": "Charizard",
             "type": [
                 "Fire"
             ]

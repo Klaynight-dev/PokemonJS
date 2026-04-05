@@ -109,7 +109,7 @@ export const pokemon_moves =
             ],
             "form": "Fall_2019",
             "pokemon_id": 4,
-            "pokemon_name": "Charmander"
+            "pokemon_name": "Charizard"
         },
         {
             "charged_moves": [
@@ -125,7 +125,7 @@ export const pokemon_moves =
             ],
             "form": "Normal",
             "pokemon_id": 4,
-            "pokemon_name": "Charmander"
+            "pokemon_name": "Charizard"
         },
         {
             "charged_moves": [

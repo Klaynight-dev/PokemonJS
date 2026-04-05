@@ -353,7 +353,7 @@ getBestFastAttacksForEnemy(true, "Charizard");
 // sortPokemonsByTypeThenName();
 // getWeakestEnemies("Flamethrower");
 // getBestFastAttacksForEnemy(true, "Bulbasaur");
-// fastFight("Bulbasaur", "Charmander");
+// fastFight("Bulbasaur", "Charizard");
 
 export {
   testPokemonToString,

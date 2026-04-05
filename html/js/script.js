@@ -202,14 +202,14 @@ function createPokemonTableFromGroups(groups) {
             const idNum = Number(group.id);
             if (!Number.isNaN(idNum)) {
                 const padded = idNum < 10 ? '00' + idNum : idNum < 100 ? '0' + idNum : String(idNum);
-                img.src = './imgs/webp/thumbnails/' + padded + '.webp';
+                img.src = './webp/thumbnails/' + padded + '.webp';
                 img.alt = group.name || '';
                 img.onerror = () => {
-                    img.src = './imgs/webp/thumbnails-none.webp';
+                    img.src = './webp/thumbnails-none.webp';
                     img.alt = group.name || '';
                 }
             } else {
-                img.src = './imgs/webp/thumbnails-none.webp';
+                img.src = './webp/thumbnails-none.webp';
                 img.alt = group.name || '';
             }
         }
@@ -271,7 +271,7 @@ function showDetailsForRow(row) {
     const idNum = Number(group.id);
     if (!Number.isNaN(idNum)) {
         const padded = idNum < 10 ? '00' + idNum : idNum < 100 ? '0' + idNum : String(idNum);
-        imgEl.src = './imgs/webp/images/' + padded + '.webp';
+        imgEl.src = './webp/images/' + padded + '.webp';
         imgEl.alt = group.name || '';
     } else {
         imgEl.src = '';

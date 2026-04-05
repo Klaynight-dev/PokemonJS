@@ -90,7 +90,7 @@ const clearConsole = () => {
 createConsoleProxy();
 
 const actions = {
-  fastFight: () => Tests.fastFight('Bulbasaur', 'Charmander'),
+  fastFight: () => Tests.fastFight('Bulbasaur', 'Charizard'),
   // testPokemonToString: () => Tests.testPokemonToString(),
   getAttacksByType: (arg) => Tests.getAttacksByType(arg),
   getPokemonsByType: (arg) => Tests.getPokemonsByType(arg),
