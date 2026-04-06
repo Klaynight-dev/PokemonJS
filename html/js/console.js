@@ -90,13 +90,13 @@ const clearConsole = () => {
 createConsoleProxy();
 
 const actions = {
-  fastFight: () => Tests.fastFight('Bulbasaur', 'Charizard'),
-  // testPokemonToString: () => Tests.testPokemonToString(),
-  getAttacksByType: (arg) => Tests.getAttacksByType(arg),
-  getPokemonsByType: (arg) => Tests.getPokemonsByType(arg),
-  getPokemonsByAttack: (arg) => Tests.getPokemonsByAttack(arg),
-  sortPokemonsByTypeThenName: () => Tests.sortPokemonsByTypeThenName(),
-  getWeakestEnemies: (arg) => Tests.getWeakestEnemies(arg),
+  fastFight: () => Tests.Class.Pokemon.fastFight('Bulbasaur', 'Charizard'),
+  // testPokemonToString: () => Class.Pokemon.testPokemonToString(),
+  getAttacksByType: (arg) => Tests.Class.Pokemon.getAttacksByType(arg),
+  getPokemonsByType: (arg) => Tests.Class.Pokemon.getPokemonsByType(arg),
+  getPokemonsByAttack: (arg) => Tests.Class.Pokemon.getPokemonsByAttack(arg),
+  sortPokemonsByTypeThenName: () => Tests.Class.Pokemon.sortPokemonsByTypeThenName(),
+  getWeakestEnemies: (arg) => Tests.Class.Pokemon.getWeakestEnemies(arg),
   clear: () => clearConsole()
 };
 

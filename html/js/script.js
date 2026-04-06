@@ -604,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
     Class.Attack.fill_attacks(Class.fast_moves);
     Class.Attack.fill_attacks(Class.charged_moves);
-    PokeFonctions.fill_Pokemons();
+    PokeFonctions.fill_Pokemons(Class.pokemons, Class.pokemon_moves, Class.pokemon_types);
     const pokemons = Class.Pokemon.all_pokemons;
 
     groupsArray = buildGroupsFromPokemons(pokemons);
