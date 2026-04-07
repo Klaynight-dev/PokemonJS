@@ -1,5 +1,4 @@
 import * as Class from '../test/import.test.js';
-import * as PokeFonctions from '../test/test.js';
 
 /** Variables partagées utilisées par les fonctions :
  * Fonction de tri : currentSortKey, currentSortDir
@@ -35,6 +34,25 @@ function getPrimaryVariant(group) {
 }
 
 /**
+ * Retourne un tableau de noms de types pour une variante (robuste aux différents formats).
+ * @param {Object} variant
+ * @returns {string[]}
+ */
+function getVariantTypeNames(variant) {
+    const types = variant?.types ?? (typeof variant?.getTypes === 'function' ? variant.getTypes() : undefined) ?? variant?.type ?? variant?.types_list ?? [];
+    if (Array.isArray(types)) {
+        return types.map(t => {
+            if (typeof t === 'string') return t;
+            if (t && typeof t.type_name === 'string') return t.type_name;
+            if (t && typeof t.type === 'string') return t.type;
+            return '';
+        }).filter(Boolean);
+    }
+    if (typeof types === 'string') return [types];
+    return [];
+}
+
+/**
  * Récupère la valeur de tri d'un groupe de variantes en fonction de la clé de tri spécifiée.
  * La fonction tente d'extraire la valeur de tri à partir de la variante principale du groupe, en utilisant différentes propriétés selon la clé.
  * @param {Object} group - Groupe de variantes à partir duquel extraire la valeur de tri.
@@ -48,8 +66,8 @@ function getSortValue(group, key) {
         case 'Nom': return String(group.name || '').toLowerCase();
         case 'Génération': return String(v.form ?? v.forme ?? v.generation ?? v.variant ?? '').toLowerCase();
         case 'Types': {
-            const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypes() : undefined) ?? v.type ?? v.types_list ?? [];
-            return Array.isArray(types) ? types.join(', ').toLowerCase() : String(types || '').toLowerCase();
+            const typeNames = getVariantTypeNames(v);
+            return typeNames.join(', ').toLowerCase();
         }
         case 'Endurance': return Number(v.base_stamina ?? v.stamina ?? v.hp) || 0;
         case 'Attaque': return Number(v.base_attack ?? v.attack) || 0;
@@ -191,8 +209,8 @@ function createPokemonTableFromGroups(groups) {
          * @param {*} variant - La variante à appliquer.
          */
         function applyVariant(variant) {
-            const types = variant.types ?? (typeof variant.getTypes === 'function' ? variant.getTypes() : undefined) ?? variant.type ?? variant.types_list ?? [];
-            tdTypes.textContent = Array.isArray(types) ? types.join(', ') : (types || '');
+            const typeNames = getVariantTypeNames(variant);
+            tdTypes.textContent = typeNames.join(', ');
             const stamina = variant.base_stamina ?? variant.stamina ?? variant.hp ?? '';
             const attack = variant.base_attack ?? variant.attack ?? '';
             const defense = variant.base_defense ?? variant.defense ?? '';
@@ -601,10 +619,10 @@ document.addEventListener('change', e => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    Class.Type.fillTypes(Class.type_effectiveness['type_effectiveness']);
+    Class.Type.fillTypes(Class.type_effectiveness);
     Class.Attack.fill_attacks(Class.fast_moves);
     Class.Attack.fill_attacks(Class.charged_moves);
-    PokeFonctions.fill_Pokemons(Class.pokemons, Class.pokemon_moves, Class.pokemon_types);
+    Class.Pokemon.fill_Pokemons(Class.pokemons, Class.pokemon_moves, Class.pokemon_types);
     const pokemons = Class.Pokemon.all_pokemons;
 
     groupsArray = buildGroupsFromPokemons(pokemons);
