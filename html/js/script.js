@@ -66,8 +66,8 @@ function getSortValue(group, key) {
         case 'Nom': return String(group.name || '').toLowerCase();
         case 'Génération': return String(v.form ?? v.forme ?? v.generation ?? v.variant ?? '').toLowerCase();
         case 'Types': {
-            const typeNames = getVariantTypeNames(v);
-            return typeNames.join(', ').toLowerCase();
+            const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypesLowerCase() : undefined) ?? v.type ?? v.types_list ?? [];
+            return Array.isArray(types) ? types.join(', ').toLowerCase() : String(types || '').toLowerCase();
         }
         case 'Endurance': return Number(v.base_stamina ?? v.stamina ?? v.hp) || 0;
         case 'Attaque': return Number(v.base_attack ?? v.attack) || 0;
@@ -209,8 +209,8 @@ function createPokemonTableFromGroups(groups) {
          * @param {*} variant - La variante à appliquer.
          */
         function applyVariant(variant) {
-            const typeNames = getVariantTypeNames(variant);
-            tdTypes.textContent = typeNames.join(', ');
+            const types = variant.types ?? (typeof variant.getTypes === 'function' ? variant.getTypesLowerCase() : undefined) ?? variant.type ?? variant.types_list ?? [];
+            tdTypes.textContent = Array.isArray(types) ? types.join(', ') : (types || '');
             const stamina = variant.base_stamina ?? variant.stamina ?? variant.hp ?? '';
             const attack = variant.base_attack ?? variant.attack ?? '';
             const defense = variant.base_defense ?? variant.defense ?? '';
@@ -298,7 +298,7 @@ function showDetailsForRow(row) {
 
     titleEl.textContent = `${group.id} — ${group.name || ''}`;
 
-    const typeNames = getVariantTypeNames(variant);
+    const types = variant.types ?? (typeof variant.getTypes === 'function' ? variant.getTypesLowerCase() : undefined) ?? variant.type ?? variant.types_list ?? [];
     const stamina = variant.base_stamina ?? variant.stamina ?? variant.hp ?? '';
     const attack = variant.base_attack ?? variant.attack ?? '';
     const defense = variant.base_defense ?? variant.defense ?? '';
@@ -499,8 +499,9 @@ function populateFilters() {
     const fastSet = new Set();
     groupsArray.forEach(g => {
         g.variants.forEach(v => {
-            const typeNames = getVariantTypeNames(v);
-            typeNames.forEach(t => t && typeSet.add(t));
+            console.table(v.getTypesLowerCase()[0]);
+            const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypesLowerCase() : undefined) ?? v.type ?? v.types_list ?? [];
+            if (Array.isArray(types)) types.forEach(t => t && typeSet.add(t)); else if (types) typeSet.add(types);
             (v.fast_attacks || []).forEach(a => { if (a && a.name) fastSet.add(a.name); });
         });
     });
@@ -528,8 +529,9 @@ function populateFilters() {
 function matchesType(group, type) {
     if (!type) return true;
     return group.variants.some(v => {
-        const typeNames = getVariantTypeNames(v);
-        return typeNames.includes(type);
+        const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypesLowerCase() : undefined) ?? v.type ?? v.types_list ?? [];
+        if (Array.isArray(types)) return types.includes(type);
+        return (types || '') === type;
     });
 }
 
@@ -550,7 +552,9 @@ function matchesFast(group, fast) {
 function applyFilters() {
     const t = (typeSelect && typeSelect.value) ? typeSelect.value.trim() : '';
     const f = (fastSelect && fastSelect.value) ? fastSelect.value.trim() : '';
-    const name = (nameInput && nameInput.value) ? nameInput.value.trim().toLowerCase() : '';
+    //.normalize("NFD").replace(/[\u0300-\u036f]/g, "") sert à enlever les accents
+    const name = (nameInput && nameInput.value) ? nameInput.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
+    console.log(name);
     filteredGroups = groupsArray.filter(g => {
         if (name) {
             const n = String(g.name || '').toLowerCase();
