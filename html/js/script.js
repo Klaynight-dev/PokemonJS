@@ -298,14 +298,14 @@ function showDetailsForRow(row) {
 
     titleEl.textContent = `${group.id} — ${group.name || ''}`;
 
-    const types = variant.types ?? (typeof variant.getTypes === 'function' ? variant.getTypes() : undefined) ?? variant.type ?? variant.types_list ?? [];
+    const typeNames = getVariantTypeNames(variant);
     const stamina = variant.base_stamina ?? variant.stamina ?? variant.hp ?? '';
     const attack = variant.base_attack ?? variant.attack ?? '';
     const defense = variant.base_defense ?? variant.defense ?? '';
 
     statsEl.innerHTML = `
         <table class="details-stats">
-            <tr><th>Types</th><td>${Array.isArray(types) ? types.join(', ') : (types || '')}</td></tr>
+            <tr><th>Types</th><td>${typeNames.join(', ')}</td></tr>
             <tr><th>Endurance</th><td>${stamina}</td></tr>
             <tr><th>Attaque</th><td>${attack}</td></tr>
             <tr><th>Défense</th><td>${defense}</td></tr>
@@ -499,8 +499,8 @@ function populateFilters() {
     const fastSet = new Set();
     groupsArray.forEach(g => {
         g.variants.forEach(v => {
-            const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypes() : undefined) ?? v.type ?? v.types_list ?? [];
-            if (Array.isArray(types)) types.forEach(t => t && typeSet.add(t)); else if (types) typeSet.add(types);
+            const typeNames = getVariantTypeNames(v);
+            typeNames.forEach(t => t && typeSet.add(t));
             (v.fast_attacks || []).forEach(a => { if (a && a.name) fastSet.add(a.name); });
         });
     });
@@ -528,9 +528,8 @@ function populateFilters() {
 function matchesType(group, type) {
     if (!type) return true;
     return group.variants.some(v => {
-        const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypes() : undefined) ?? v.type ?? v.types_list ?? [];
-        if (Array.isArray(types)) return types.includes(type);
-        return (types || '') === type;
+        const typeNames = getVariantTypeNames(v);
+        return typeNames.includes(type);
     });
 }
 
