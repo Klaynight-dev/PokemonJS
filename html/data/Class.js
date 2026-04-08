@@ -1,5 +1,5 @@
 export class Attack {
-    static all_attacks = [];
+    static all_attacks = {};
 
     constructor(critical_chance=0, duration, energy_delta, move_id, name, power, stamina_loss_scaler, type) {
         /**
@@ -23,7 +23,7 @@ export class Attack {
         this._critical_chance = critical_chance;
         this._stamina_loss_scaler = stamina_loss_scaler;
         this.isCriticalAttack = critical_chance > 0;
-        Attack.all_attacks.push(this);
+        Attack.all_attacks[move_id] = this;
     }
 
     toString() {
@@ -45,7 +45,7 @@ export class Attack {
     }
 
     static attack_by_name(attackName){
-        return Attack.all_attacks.filter(attack => attack.name.toLowerCase() === attackName?.toLowerCase())[0];
+        return Object.values(Attack.all_attacks).filter(attack => attack.name.toLowerCase() === attackName?.toLowerCase())[0];
     }
 
     // Getters
@@ -189,7 +189,7 @@ export class Pokemon {
     static fill_Pokemons(dataPokemons, dataMoves, dataTypes) {
         Pokemon.all_pokemons.length = 0;
 
-        const attackByName = new Map(Attack.all_attacks.map(a => [a.name, a]));
+        const attackByName = new Map(Object.values(Attack.all_attacks).map(a => [a.name, a]));
 
         for (const poke of dataPokemons) {
             const moves = dataMoves.find(m => m.pokemon_id === poke.pokemon_id && m.form === poke.form);
@@ -317,7 +317,7 @@ export class Pokemon {
         const best = this.fast_attacks.reduce((bestSoFar, attack) => {
             let multiplier = 1;
             for (const defType of pokemon.getTypes()) {
-                const effectiveness = Type.type_by_name(attack.type).effectiveness(defType);
+                const effectiveness = Type.type_by_name(attack.type).efficiency[defType];
                 if (effectiveness) {
                     multiplier *= effectiveness;
                 }
@@ -355,7 +355,7 @@ export class Pokemon {
         if (effectiveness) {
             for (const [enemyType, multiplier] of Object.entries(effectiveness)) {
                 if (multiplier > 1) {
-                    weakTypes.push(Type.type_by_id(enemyType).type_name.toLowerCase());
+                    weakTypes.push(enemyType.toLowerCase());
                 }
             }
         }
@@ -459,7 +459,7 @@ export class Pokemon {
      */
     static getAttacksByType(typeName) {
         let toPrint = [];
-        const matches = Attack.all_attacks.filter(attack => attack.type.toLowerCase() === typeName.toLowerCase());
+        const matches = Object.values(Attack.all_attacks).filter(attack => attack.type.toLowerCase() === typeName.toLowerCase());
         if (matches.length === 0) {
             console.table("Aucune attaque de type " + typeName);
             return;
@@ -475,15 +475,11 @@ export class Pokemon {
 }
 
 export class Type{
-    static all_types = [];
+    static all_types = {};
     constructor(type_name, efficiency){
         this._type_name = type_name;
         this._efficiency = efficiency;
-        Type.all_types.push(this);
-    }
-
-    static typeName(number){
-        return Type.all_types[number].type_name;
+        Type.all_types[type_name] = this;
     }
 
     toString(){
@@ -494,19 +490,18 @@ export class Type{
         let result = [];
         let finalResult = [];
         let temp=[];
-        for (let elem in this._efficiency){
-            if (!temp.includes(this._efficiency[elem])){
+        for (const [key, value] of Object.entries(this._efficiency)) {
+             if (!temp.includes(value)){
                 result[temp.length] = [];
-                result[temp.length][1] = Type.typeName(elem);
-                result[temp.length][0] = this._efficiency[elem];
-                temp.push(this._efficiency[elem]);
+                result[temp.length][1] = key;
+                result[temp.length][0] = value;
+                temp.push(value);
             }else{
-                result[temp.indexOf(this._efficiency[elem])][1]+= ', ' + Type.typeName(elem);
+                result[temp.indexOf(value)][1]+= ', ' + key;
             }
         }
         finalResult = '';
         for (let elem in result){
-            console.log(elem);
             if (elem != 0){
                 finalResult+= ', ';
             }
@@ -515,14 +510,9 @@ export class Type{
         return finalResult;
     }
 
-    effectiveness(onType){
-        return this.efficiency[Type.all_types.indexOf(onType)];
-    }
-
     static fillTypes(data){
-        let i=0;
-        for (let nType in data){
-            new Type(nType, Object.values(Object.values(data)[i++]));
+        for (const [key, value] of Object.entries(data)) {
+            new Type(key, value);
         }
     }
 
@@ -533,11 +523,7 @@ export class Type{
     }
 
     static type_by_name(typeName){
-        return Type.all_types.filter(type => type.type_name.toLowerCase() === typeName?.toLowerCase())[0];
-    }
-
-    static type_by_id(typeId){
-        return Type.all_types[typeId];
+        return Type.all_types[typeName];
     }
 
     get type_name() {

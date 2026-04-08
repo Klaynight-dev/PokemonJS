@@ -27,49 +27,18 @@ import * as Class from './import.test.js';
 
 //=================================================================================\\
 
+console.log("---------");
 Class.Attack.fill_attacks(Class.fast_moves);
-// console.table(Class.Attack.all_attacks);
 Class.Attack.fill_attacks(Class.charged_moves);
-// console.table(Class.Attack.all_attacks);
 
 
 Class.Type.fillTypes(Class.type_effectiveness);
+// console.log(Class.Type.all_types['Bug'].effectiveness('Bug'));
+// console.log(Class.Type.all_types.Bug);
 
 Class.Pokemon.fill_Pokemons(Class.pokemons, Class.pokemon_moves, Class.pokemon_types);
 
-// getBestFastAttacksForEnemy(true, "Charizard");
-// console.table(getPokemonsByType());
-// console.table(Class.Pokemon.all_pokemons[0].getAttacks());
-// console.table(Class.Pokemon.all_pokemons[0].charged_attacks);
-// console.table(Class.Pokemon.all_pokemons[0].fast_attacks);
-
-
-// fill_Pokemons();
-
-// const attack1 = Class.Attack.all_attacks[0];
-// console.table(attack1.toString());
-
-// testPokemonToString();
-// getPokemonsByType("Fire");
-// getPokemonsByAttack("Flamethrower");
-// getAttacksByType("Fire");
-// sortPokemonsByTypeThenName();
-// getWeakestEnemies("Flamethrower");
-// console.table(Class.Pokemon.all_pokemons.find(p => p.name.toLowerCase() === "Charizard".toLowerCase()).getBestFastAttacksForEnemy(true, "Bulbasaur"));
-
-//[0].getBestFastAttacksForEnemy(true, "Bulbasaur")
-// fastFight("Bulbasaur", "Charizard");
-
-// Class.Pokemon.getWeakestEnemies("Flamethrower");
-// console.table(Class.Type.all_types[0]["_type_name"]);
-// console.table(Class.Type.type_by_name("Water"));
-// console.table(Class.Pokemon.all_pokemons[0].getTypes());
-// console.table(Class.Pokemon.all_pokemons[0].getTypes()[0]);
-// console.table(Class.Pokemon.all_pokemons[0].getTypes()[0][0].type_name);
-// console.table(Class.Pokemon.all_pokemons[0].getTypesLowerCase());
-// console.table(Class.Attack.all_attacks[0].toString());
-
-// console.table(Class.Pokemon.getWeakestEnemies("Flamethrower"));
+Class.Pokemon.getWeakestEnemies("Flamethrower");
 
 export {
   Class
