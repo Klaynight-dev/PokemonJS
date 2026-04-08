@@ -76,7 +76,7 @@ export class Attack {
 }
 
 export class Pokemon {
-    static all_pokemons = [];
+    static all_pokemons = {};
 
     constructor(pokemon_id, pokemon_name, form, base_attack, base_defense, base_stamina, charged_attacks, fast_attacks, types = []) {
         this._id = pokemon_id;
@@ -89,7 +89,7 @@ export class Pokemon {
         this._fast_attacks = fast_attacks;
         this._types = Array.isArray(types) ? types : [];
         this._types.sort()
-        Pokemon.all_pokemons.push(this);
+        Pokemon.all_pokemons[pokemon_id] = this;
     }
 
     toString() {
@@ -187,7 +187,7 @@ export class Pokemon {
  * @returns {void}
  */
     static fill_Pokemons(dataPokemons, dataMoves, dataTypes) {
-        Pokemon.all_pokemons.length = 0;
+        Object.values(Pokemon.all_pokemons).length = 0;
 
         const attackByName = new Map(Object.values(Attack.all_attacks).map(a => [a.name, a]));
 
@@ -238,8 +238,8 @@ export class Pokemon {
      * @returns {void}
      */
     static fastFight(pokemonNameA, pokemonNameB) {
-        const pokemonA = Pokemon.all_pokemons.find(p => p.name.toLowerCase() === pokemonNameA.toLowerCase());
-        const pokemonB = Pokemon.all_pokemons.find(p => p.name.toLowerCase() === pokemonNameB.toLowerCase());
+        const pokemonA = Object.values(Pokemon.all_pokemons).find(p => p.name.toLowerCase() === pokemonNameA.toLowerCase());
+        const pokemonB = Object.values(Pokemon.all_pokemons).find(p => p.name.toLowerCase() === pokemonNameB.toLowerCase());
 
         if (!pokemonA || !pokemonB) {
             console.table(`Pokémon introuvable : ${!pokemonA ? pokemonNameA : pokemonNameB}`);
@@ -305,7 +305,7 @@ export class Pokemon {
      * @return {Object} Un objet contenant l'attaque rapide la plus efficace, les points de dégâts par seconde (DPS) et le multiplicateur d'efficacité contre le Pokémon ennemi. 
      */
     getBestFastAttacksForEnemy(print, pokemonName) {
-        const pokemon = Pokemon.all_pokemons.find(p => p.name.toLowerCase() === pokemonName.toLowerCase());
+        const pokemon = Object.values(Pokemon.all_pokemons).find(p => p.name.toLowerCase() === pokemonName.toLowerCase());
         if (!pokemon) {
             if (print) {
                 console.table("Aucun Pokémon trouvé avec le nom " + pokemonName);
@@ -359,7 +359,7 @@ export class Pokemon {
                 }
             }
         }
-        const weakPokemons = Pokemon.all_pokemons.filter(p => p.getTypesLowerCase().some(a => weakTypes.includes(a.toLowerCase())));
+        const weakPokemons = Object.values(Pokemon.all_pokemons).filter(p => p.getTypesLowerCase().some(a => weakTypes.includes(a.toLowerCase())));
         console.table("Liste des " + weakPokemons.length + " pokémons faibles face à l'attaque " + attackName + " (ceux ayant les types " + weakTypes + ") :");
         weakPokemons.forEach(weakToString => {
             console.table(weakToString.toString());
@@ -372,7 +372,7 @@ export class Pokemon {
      * @returns {void}
      */
     static sortPokemonsByTypeThenName() {
-        const sortedPokemons = [...Pokemon.all_pokemons].sort((a, b) => {
+        const sortedPokemons = [...Object.values(Pokemon.all_pokemons)].sort((a, b) => {
             const typeA = a.getTypesLowerCase()[0] || "";
             const typeB = b.getTypesLowerCase()[0] || "";
             if (typeA === typeB) {
@@ -411,7 +411,7 @@ export class Pokemon {
     static getPokemonsByType(typeName) {
         const temp = [];
         let toPrint = [];
-        for (const pokemon of Pokemon.all_pokemons) {
+        for (const pokemon of Object.values(Pokemon.all_pokemons)) {
             if (pokemon.getTypesLowerCase().includes(typeName?.toLowerCase())) {
                 if (!temp.includes(pokemon.id)) {
                     temp.push(pokemon.id);
@@ -433,7 +433,7 @@ export class Pokemon {
     static getPokemonsByAttack(attackName) {
         const temp = [];
         let toPrint = [];
-        const learners = Pokemon.all_pokemons.filter(p => p.getAttacks().some(a => a.name?.toLowerCase() === attackName?.toLowerCase()));
+        const learners = Object.values(Pokemon.all_pokemons).filter(p => p.getAttacks().some(a => a.name?.toLowerCase() === attackName?.toLowerCase()));
 
         if (learners.length === 0) {
             console.table("Aucun Pokémon ne peut apprendre l'attaque " + attackName);

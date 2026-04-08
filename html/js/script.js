@@ -305,7 +305,7 @@ function showDetailsForRow(row) {
 
     statsEl.innerHTML = `
         <table class="details-stats">
-            <tr><th>Types</th><td>${typeNames.join(', ')}</td></tr>
+            <tr><th>Types</th><td>${types.join(', ')}</td></tr>
             <tr><th>Endurance</th><td>${stamina}</td></tr>
             <tr><th>Attaque</th><td>${attack}</td></tr>
             <tr><th>Défense</th><td>${defense}</td></tr>
@@ -626,7 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Class.Attack.fill_attacks(Class.fast_moves);
     Class.Attack.fill_attacks(Class.charged_moves);
     Class.Pokemon.fill_Pokemons(Class.pokemons, Class.pokemon_moves, Class.pokemon_types);
-    const pokemons = Class.Pokemon.all_pokemons;
+    const pokemons = Object.values(Class.Pokemon.all_pokemons);
 
     groupsArray = buildGroupsFromPokemons(pokemons);
     filteredGroups = groupsArray.slice();
