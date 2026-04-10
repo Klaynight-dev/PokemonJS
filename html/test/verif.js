@@ -1,15 +1,15 @@
-console.log("Tous les Pokemons");
-console.log(Pokemon.all_pokemons);
-console.log("-------------------");
-console.log("Pokemon 1 (Bulbasaur)");
-console.log(Pokemon.all_pokemons[1].toString());
-console.log("-------------------");
-console.log("Pokemons Grass");
-console.log(getPokemonsByType('Grass'))
-console.log("-------------------");
-console.log("Attaque 210 (Wing Attack)");
-console.log(Pokemon.all_attacks[210].toString());
-console.log("-------------------");
-console.log("Type Bug");
-console.log(Pokemon.all_types['Bug'].toString());
-console.log("-------------------");
+console.table("Tous les Pokemons");
+console.table(Pokemon.all_pokemons);
+console.table("-------------------");
+console.table("Pokemon 1 (Bulbasaur)");
+console.table(Pokemon.all_pokemons[1].toString());
+console.table("-------------------");
+console.table("Pokemons Grass");
+console.table(getPokemonsByType('Grass'))
+console.table("-------------------");
+console.table("Attaque 210 (Wing Attack)");
+console.table(Pokemon.all_attacks[210].toString());
+console.table("-------------------");
+console.table("Type Bug");
+console.table(Pokemon.all_types['Bug'].toString());
+console.table("-------------------");

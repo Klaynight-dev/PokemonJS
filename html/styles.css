@@ -103,24 +103,14 @@ table th, table td {
   padding: 0.75rem 1rem;
   text-align: left;
 }
+table th:nth-of-type(3), table td:nth-of-type(3) {
+  display: none;
+}
 table th {
   background: #2d323b;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 0.03em;
   border-bottom: 2px solid #3a3f47;
-}
-table th.sorted {
-  font-weight: 700;
-}
-table th.sorted.asc::after {
-  content: ' ▲';
-  font-size: 0.85em;
-  margin-left: 6px;
-}
-table th.sorted.desc::after {
-  content: ' ▼';
-  font-size: 0.85em;
-  margin-left: 6px;
 }
 table tr {
   transition: background 0.15s;
@@ -241,6 +231,19 @@ table select:focus {
   }
   tr {
     cursor: default;
+  }
+  table th.sorted {
+    font-weight: 700;
+  }
+  table th.sorted.asc::after {
+    content: " ▲";
+    font-size: 0.85em;
+    margin-left: 6px;
+  }
+  table th.sorted.desc::after {
+    content: " ▼";
+    font-size: 0.85em;
+    margin-left: 6px;
   }
 }
 @media (max-width: 794px) {

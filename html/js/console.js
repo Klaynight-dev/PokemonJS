@@ -22,7 +22,7 @@ const appendLine = (text, level = 'log') => {
 };
 
 const originalConsole = {
-  log: console.log.bind(console),
+  log: console.table.bind(console),
   info: console.info.bind(console),
   warn: console.warn.bind(console),
   error: console.error.bind(console),
@@ -30,8 +30,8 @@ const originalConsole = {
 };
 
 const createConsoleProxy = () => {
-  console.log = (...args) => {
-    originalConsole.log(...args);
+  console.table = (...args) => {
+    originalconsole.table(...args);
     appendLine(args.map(a => (typeof a === 'object' ? JSON.stringify(a, null, 2) : a)).join(' '), 'log');
   };
 
@@ -125,4 +125,4 @@ const setupLinks = () => {
 setupLinks();
 
 clearConsole();
-console.log('Utilisez les boutons ci-dessus pour exécuter un test.');
+console.table('Utilisez les boutons ci-dessus pour exécuter un test.');

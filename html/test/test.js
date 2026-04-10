@@ -27,19 +27,19 @@ import * as Class from './import.test.js';
 
 //=================================================================================\\
 
-console.log("---------");
+console.table("---------");
 Class.Attack.fill_attacks(Class.fast_moves);
 Class.Attack.fill_attacks(Class.charged_moves);
 
 
 Class.Type.fillTypes(Class.type_effectiveness);
-// console.log(Class.Type.all_types['Bug'].effectiveness('Bug'));
-// console.log(Class.Type.all_types.Bug);
+// console.table(Class.Type.all_types['Bug'].effectiveness('Bug'));
+// console.table(Class.Type.all_types.Bug);
 
 Class.Pokemon.fill_Pokemons(Class.pokemons, Class.pokemon_moves, Class.pokemon_types);
 
 // Class.Pokemon.getWeakestEnemies("Flamethrower");
-console.log(Object.values(Class.Pokemon.all_pokemons));
+console.table(Object.values(Class.Pokemon.all_pokemons));
 
 
 export {

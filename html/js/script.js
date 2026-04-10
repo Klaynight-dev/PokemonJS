@@ -499,7 +499,6 @@ function populateFilters() {
     const fastSet = new Set();
     groupsArray.forEach(g => {
         g.variants.forEach(v => {
-            console.table(v.getTypesLowerCase()[0]);
             const types = v.types ?? (typeof v.getTypes === 'function' ? v.getTypesLowerCase() : undefined) ?? v.type ?? v.types_list ?? [];
             if (Array.isArray(types)) types.forEach(t => t && typeSet.add(t)); else if (types) typeSet.add(types);
             (v.fast_attacks || []).forEach(a => { if (a && a.name) fastSet.add(a.name); });
@@ -554,7 +553,6 @@ function applyFilters() {
     const f = (fastSelect && fastSelect.value) ? fastSelect.value.trim() : '';
     //.normalize("NFD").replace(/[\u0300-\u036f]/g, "") sert à enlever les accents
     const name = (nameInput && nameInput.value) ? nameInput.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
-    console.log(name);
     filteredGroups = groupsArray.filter(g => {
         if (name) {
             const n = String(g.name || '').toLowerCase();
