@@ -79,6 +79,18 @@ export class Pokemon {
     static all_pokemons = {};
 
     constructor(pokemon_id, pokemon_name, form, base_attack, base_defense, base_stamina, charged_attacks, fast_attacks, types = []) {
+        /**
+         * @property {int}    id                   - The unique identifier for the pokemon
+         * @property {string} name                 - The name of the pokemon
+         * @property {string} form                 - The variant's form of the pokemon (normal, Alola, an anniversary version...)
+         * @property {int} base_attack             - The pokemon's base attack
+         * @property {int} base_defense            - The pokemon's base defense
+         * @property {int} base_stamina            - The pokemon's base stamina
+         * @property {Array} charged_attacks       - A list of the pokemon's charged attacks
+         * @property {Array} fast_attacks          - A list of the pokemon's fast attacks
+         * @property {Array} types                 - A list of the pokemon's type or types (sorted by alphabetical order)
+         * @function Attack.fill_attacks(data)     - A static method to fill the list of all attacks from a data array
+         */
         this._id = pokemon_id;
         this._name = pokemon_name;
         this._form = form;
@@ -182,8 +194,10 @@ export class Pokemon {
 
 
     /**
- * Function pour remplir la liste des Pokémons à partir des données importées, en associant les attaques correspondantes à chaque Pokémon en fonction de leurs noms.
- * Cette fonction utilise les données des Pokémons, des attaques rapides et des attaques chargées pour créer des instances de la classe Pokemon avec les attaques correspondantes.
+ * Function to fill Pokemon list with imported data, associating attacks to corresponding pokemon's names 
+ * @param {Array} dataPokemons data from pokemons.js
+ * @param {Array} dataMoves data from pokemon_moves.js
+ * @param {Array} dataTypes data from pokemon_types.js
  * @returns {void}
  */
     static fill_Pokemons(dataPokemons, dataMoves, dataTypes) {
@@ -207,7 +221,7 @@ export class Pokemon {
                 .map(name => attackByName.get(name))
                 .filter(Boolean);
 
-            // Cherche les types d'espèce correspondants dans les données `pokemon_types`
+            // Search for corresponding species's types
             const typeEntry = (dataTypes || []).find(t => t.pokemon_id === poke.pokemon_id && t.form === poke.form);
             const speciesTypes = typeEntry ? typeEntry.type : [];
             var speciesObjectTypes = [];
@@ -230,11 +244,11 @@ export class Pokemon {
     }
 
     /**
-     * Simule un combat entre deux Pokémons en utilisant des attaques rapides.
-     * Affiche dans la console le déroulement du combat sous la forme d'un tableau.
+     * Simulate a battle betwwen two pokemons using fast moves
+     * Print on console the battle happenings in the form of an array
      *
-     * @param {string} pokemonNameA - Nom du premier Pokémon (commence le combat).
-     * @param {string} pokemonNameB - Nom du second Pokémon.
+     * @param {string} pokemonNameA - Name of the first Pokemon (the one starting the fight)
+     * @param {string} pokemonNameB - Name of the second Pokemon
      * @returns {void}
      */
     static fastFight(pokemonNameA, pokemonNameB) {
@@ -281,7 +295,7 @@ export class Pokemon {
                 Défenseur: defender.name,
                 DEF: defender.base_defense,
                 "Nom Attaque": bestAttack.atk.name,
-                Effect: bestAttack.eff.toFixed(2),
+                Efficacité: bestAttack.eff.toFixed(2),
                 Dégâts: damage,
                 Reste: defenderHp   
             });
@@ -299,10 +313,10 @@ export class Pokemon {
     }
 
     /**
-     * Affiche la meilleure attaque rapide contre un Pokémon ennemi donné.
-     * @param {Boolean} print 
-     * @param {String} pokemonName
-     * @return {Object} Un objet contenant l'attaque rapide la plus efficace, les points de dégâts par seconde (DPS) et le multiplicateur d'efficacité contre le Pokémon ennemi. 
+     * Print/return the best fast move of a given Pokemon (the one this function is called on) against another given Pokemon
+     * @param {Boolean} print If print is true then the best fast move is printed in the console. If it's false, it's simply returned/
+     * @param {String} pokemonName The name of the enemy Pokemon, the one who will be attacked
+     * @return {Object} An object returning the best fast move, damage pers second (DPS) and the efficacity multiplier
      */
     getBestFastAttacksForEnemy(print, pokemonName) {
         const pokemon = Object.values(Pokemon.all_pokemons).find(p => p.name.toLowerCase() === pokemonName.toLowerCase());
@@ -345,8 +359,8 @@ export class Pokemon {
     }
 
     /**
-     * Affiche les types de Pokémon qui sont faibles contre une attaque donnée.
-     * @param {string} attackName - Le nom de l'attaque pour laquelle trouver les faiblesses.
+     * Print pokemon's types who are weak to a given attack
+     * @param {string} attackName - name of said given attack
      * @returns {void}
      */
     static getWeakestEnemies(attackName) {
@@ -367,8 +381,8 @@ export class Pokemon {
     }
 
     /**
-     * Affiche les Pokémons triés par type puis par nom.
-     * Les Pokémons sans type sont affichés en premier, suivis des Pokémons triés par ordre alphabétique de leur type (si un Pokémon a plusieurs types, ceux-ci sont renvoyés dans un tableau trié par ordre alphabétique, si les deux Pokémons ont chacun deux types ont compare alors ces seconds types), puis par ordre alphabétique de leur nom.
+     * Print pokemons sorted by type then name
+     * Pokemon's without any type (in case of a problem in the data) are printed first, folowed by pokemon's sorted by the alphabetical order of their type (if a pokemon has two types, their types are themself sorted by alphabetical order) then by alphabetical order of their name.
      * @returns {void}
      */
     static sortPokemonsByTypeThenName() {
@@ -390,8 +404,8 @@ export class Pokemon {
     }
 
     /**
-     * Affiche les attaques avec leurs détails, en indiquant si elles sont des attaques critiques ou non, et le nombre de Pokémons pouvant les apprendre.
-     * Les attaques sont affichées dans l'ordre où elles ont été ajoutées à la classe Attack.
+     * Print attack's infos, indicating wheteher theyr are charged or not as well as the nomber of pokemons who can learn them.
+     * Attacks are printed following the order of when they were added to the Attack class
      * @returns {void}
      */
     static testPokemonToString() {
@@ -404,8 +418,8 @@ export class Pokemon {
     }
 
     /**
-     * Affiche les Pokémons d'un type donné.
-     * @param {string} typeName - Le nom du type de Pokémon à rechercher.
+     * Print Pokemons of a given type
+     * @param {string} typeName - The name of the type to search for
      * @returns {void}
      */
     static getPokemonsByType(typeName) {
@@ -426,8 +440,8 @@ export class Pokemon {
     }
 
     /**
-     * Affiche les Pokémons pouvant apprendre une attaque donnée.
-     * @param {string} attackName - Le nom de l'attaque à rechercher.
+     * Print the pokemon's who can learn a given attack
+     * @param {string} attackName - The name of the attack to search for.
      * @returns {void}
      */
     static getPokemonsByAttack(attackName) {
@@ -453,8 +467,8 @@ export class Pokemon {
     }
 
     /**
-     * Affiche les attaques d'un type donné.
-     * @param {string} typeName - Le nom du type d'attaque à rechercher (e.g., "Fire", "Water", etc.)
+     * Print attack's of a given type
+     * @param {string} typeName - The name of the type to search for.
      * @returns {void}
      */
     static getAttacksByType(typeName) {
@@ -477,6 +491,10 @@ export class Pokemon {
 export class Type{
     static all_types = {};
     constructor(type_name, efficiency){
+        /**
+         * @property {string} type_name            - the name of the type
+         * @property {Array} efficiency            - an array of objects composed of float values indexed by type names
+        */
         this._type_name = type_name;
         this._efficiency = efficiency;
         Type.all_types[type_name] = this;

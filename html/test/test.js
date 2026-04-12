@@ -39,7 +39,7 @@ Class.Type.fillTypes(Class.type_effectiveness);
 Class.Pokemon.fill_Pokemons(Class.pokemons, Class.pokemon_moves, Class.pokemon_types);
 
 // Class.Pokemon.getWeakestEnemies("Flamethrower");
-console.table(Object.values(Class.Pokemon.all_pokemons));
+// console.table(Object.values(Class.Pokemon.all_pokemons));
 
 
 export {
